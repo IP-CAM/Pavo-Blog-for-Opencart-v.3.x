@@ -71,7 +71,7 @@
                 if ( $settings ) {
                     $data['menus'][] = array(
                         'id'       => 'pavoblog',
-                        'icon'     => 'fa fa-cog fw',
+                        'icon'     => 'fa fa-tasks fw',
                         'name'     => $this->language->get( 'heading_title' ),
                         'href'     => '',
                         'children' => $settings
