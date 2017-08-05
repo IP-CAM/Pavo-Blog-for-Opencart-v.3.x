@@ -14,14 +14,6 @@
 
                 // PavoBlog Settings menu
                 $settings = array();
-                // view settings panel
-                if ( $this->user->hasPermission( 'access', 'extension/module/pavoblog/settings' ) ) {
-                    $settings[] = array(
-                        'name'     => $this->language->get('menu_settings_text'),
-                        'href'     => $this->url->link('extension/module/pavoblog/settings', 'user_token=' . $this->session->data['user_token'], true),
-                        'children' => array()   
-                    );
-                }
 
                 // access posts
                 if ( $this->user->hasPermission( 'access', 'extension/module/pavoblog/posts' ) ) {
@@ -50,20 +42,19 @@
                     );
                 }
 
-                // access tags
-                if ( $this->user->hasPermission( 'access', 'extension/module/pavoblog/tags' ) ) {
-                    $settings[] = array(
-                        'name'     => $this->language->get('menu_tags_text'),
-                        'href'     => $this->url->link('extension/module/pavoblog/tags', 'user_token=' . $this->session->data['user_token'], true),
-                        'children' => array()   
-                    );
-                }
-
                 // access comments
                 if ( $this->user->hasPermission( 'access', 'extension/module/pavoblog/comments' ) ) {
                     $settings[] = array(
                         'name'     => $this->language->get('menu_comments_text'),
                         'href'     => $this->url->link('extension/module/pavoblog/comments', 'user_token=' . $this->session->data['user_token'], true),
+                        'children' => array()   
+                    );
+                }
+                // view settings panel
+                if ( $this->user->hasPermission( 'access', 'extension/module/pavoblog/settings' ) ) {
+                    $settings[] = array(
+                        'name'     => $this->language->get('menu_settings_text'),
+                        'href'     => $this->url->link('extension/module/pavoblog/settings', 'user_token=' . $this->session->data['user_token'], true),
                         'children' => array()   
                     );
                 }
