@@ -56,9 +56,15 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->load->model( 'extension/pavoblog/post' );
 		$this->load->model( 'localisation/language' );
 		$this->load->model( 'setting/store' );
+		$this->load->model( 'user/user' );
+
+		if ( $this->request->server['REQUEST_METHOD'] === 'POST' ) {
+			var_dump(1); die();
+		}
 
 		// languages
 		$this->data['languages'] = $this->model_localisation_language->getLanguages();
+		$this->data['users'] = array();
 		$this->data['stores'][] = array(
 			'store_id' => 0,
 			'name'     => $this->language->get('text_default')
@@ -89,7 +95,20 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->data['post_id'] = ! empty( $_REQUEST['post'] ) ? $_REQUEST['post'] : 0;
 		// posts
 		$this->data['post'] = $this->data['post_id'] ? $this->model_extension_pavoblog_post->get( $this->data['post_id'] ) : array();
+		if ( ! isset( $this->data['post']['user_id'] ) ) {
+			$this->data['post']['user_id'] = $this->session->data['user_id'];
+		}
+
 		$this->data['image'] = isset( $this->data['post']['image'] ) ? $this->data['post']['image'] : HTTPS_CATALOG . 'image/cache/catalog/opencart-logo-100x100.png';
+
+		// users
+		$users = $this->model_user_user->getUsers();
+		foreach ( $users as $user ) {
+			$this->data['users'][] = array(
+					'user_id'    => $user['user_id'],
+					'username'   => $user['username']
+				);
+		}
 
 		// enqueue scripts, stylesheet needed to display editor
 		$this->document->addScript( 'view/javascript/summernote/summernote.js' );

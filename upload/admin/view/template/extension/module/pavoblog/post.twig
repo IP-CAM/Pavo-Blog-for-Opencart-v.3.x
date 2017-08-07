@@ -22,88 +22,95 @@
 		    </div>
 	    {% endif %}
 	    <div class="row">
-	    	{# Start Sidebar Actions #}
-			<div id="sidebar-upload" class="col-md-3 col-md-push-9 col-sm-12">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-				    	<h3 class="panel-title"><i class="fa fa-filter"></i> {{ entry_image_heading }}</h3>
-				  	</div>
-					<div class="panel-body">
-						<div class="table-responsive">
-			                <table class="table table-striped table-bordered table-hover">
-			                  	<tbody>
-			                    	<tr>
-			                      		<td class="text-center">
-			                      			<a href="" id="thumb-image" data-toggle="image" class="img-thumbnail">
-			                      				{% if ( image ) %}
-			                      					<img src="{{ image }}" alt="" title="" data-placeholder="{{ placeholder }}" width="100" height="100" />
-			                      				{% endif %}
-			                      			</a>
-			                        		<input type="hidden" name="image" value="{{ image }}" id="input-image" />
-			                        	</td>
-			                    	</tr>
-			                  	</tbody>
-			                </table>
-		              	</div>
+	    	<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-product" class="form-horizontal">
+		    	{# Start Sidebar Actions #}
+				<div id="sidebar-upload" class="col-md-3 col-md-push-9 col-sm-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+					    	<h3 class="panel-title"><i class="fa fa-filter"></i> {{ entry_image_heading }}</h3>
+					  	</div>
+						<div class="panel-body">
+							<div class="table-responsive">
+				                <table class="table table-striped table-bordered table-hover">
+				                  	<tbody>
+				                    	<tr>
+				                      		<td class="text-center">
+				                      			<a href="" id="thumb-image" data-toggle="image" class="img-thumbnail">
+				                      				{% if ( image ) %}
+				                      					<img src="{{ image }}" alt="" title="" data-placeholder="{{ placeholder }}" width="100" height="100" />
+				                      				{% endif %}
+				                      			</a>
+				                        		<input type="hidden" name="image" value="{{ image }}" id="input-image" />
+				                        	</td>
+				                    	</tr>
+				                  	</tbody>
+				                </table>
+			              	</div>
+						</div>
 					</div>
-				</div>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-				    	<h3 class="panel-title"><i class="fa fa-filter"></i> {{ entry_category_heading }}</h3>
-				  	</div>
-				  	<div class="panel-body">
-				  		<div class="form-group">
-							<label class="control-label" for="input-name">{{ entry_category_heading }}</label>
-
-					    </div>
-				  	</div>
-				</div>
-				<div class="panel panel-default">
-				  	<div class="panel-heading">
-				    	<h3 class="panel-title"><i class="fa fa-filter"></i> {{ entry_action_heading }}</h3>
-				  	</div>
-				  	<div class="panel-body">
-				  		<div class="form-group">
-							<label class="control-label" for="input-featured">{{ entry_featured }}</label>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+					    	<h3 class="panel-title"><i class="fa fa-filter"></i> {{ entry_category_heading }}</h3>
+					  	</div>
+					  	<div class="panel-body">
+					  		<div class="form-group">
+								
+						    </div>
+					  	</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+					    	<h3 class="panel-title"><i class="fa fa-filter"></i> {{ entry_author_title }}</h3>
+					  	</div>
+						<div class="panel-body">
+							<select class="form-control" name="featured" id="input-featured">
+								{% for user in users %}
+									<option value="{{ user.user_id }}"{{ post.user_id and post.user_id == user.user_id ? ' selected' : '' }}>{{ user.username }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					<div class="panel panel-default">
+					  	<div class="panel-heading">
+					    	<h3 class="panel-title"><i class="fa fa-filter"></i> {{ entry_action_heading }}</h3>
+					  	</div>
+					  	<div class="panel-body">
+					  		<label class="control-label" for="input-featured">{{ entry_featured }}</label>
 							<select class="form-control" name="featured" id="input-featured">
 								<option value="1"{{ featured == 1 ? ' selected' : '' }}>{{ entry_yes_text }}</option>
 								<option value="0"{{ featured == 0 ? ' selected' : '' }}>{{ entry_no_text }}</option>
 							</select>
-					    </div>
-					    <div class="form-group">
-							<label class="control-label" for="input-status">{{ entry_status_text }}</label>
+						    <label class="control-label" for="input-status">{{ entry_status_text }}</label>
 							<select class="form-control" name="status" id="input-status">
 								<option value="1"{{ status == 1 ? ' selected' : '' }}>{{ entry_enable_text }}</option>
 								<option value="0"{{ status == 0 ? ' selected' : '' }}>{{ entry_disable_text }}</option>
 							</select>
-					    </div>
-					    <div class="form-group">
-					      	<label class="control-label" for="input-date-added">{{ entry_date_added }}</label>
+						    <label class="control-label" for="input-date-added">{{ entry_date_added }}</label>
 					      	<div class="input-group date">
 						        <input type="text" name="filter_date_added" value="{{ filter_date_added }}" placeholder="{{ entry_date_added }}" data-date-format="YYYY-MM-DD" id="input-date-added" class="form-control" />
 						        <span class="input-group-btn">
 						        	<button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
 						        </span>
 						    </div>
-					    </div>
-					    <div class="form-group text-right">
-					      	<button type="button" id="button-filter" class="btn btn-primary"><i class="fa fa-save"></i> {{ post_id ? update_button : save_button }}</button>
-					      	{% if ( post_id ) %}
-					      		<button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger" onclick="confirm('{{ text_confirm }}') ? $('#form-upload').submit() : false;"><i class="fa fa-trash-o"></i></button>
-					      	{% endif %}
-					    </div>
-				  	</div>
-				</div>
-			</div>
-			{# End Sidebar Actions #}
-			{# Main Panel #}
-			<div class="col-md-9 col-md-pull-3 col-sm-12">
-		    	<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title"><i class="fa fa-list"></i> {{ post_id ? entry_edit_post_text : entry_add_post_text }}</h3>
+						    <div class="form-group text-right">
+						    	<div class="col-sm-offset-2 col-sm-10">
+						    		<button type="button" id="button-filter" class="btn btn-primary"><i class="fa fa-save"></i> {{ post_id ? update_button : save_button }}</button>
+							      	{% if ( post_id ) %}
+							      		<button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger form-control" onclick="confirm('{{ text_confirm }}') ? $('#form-upload').submit() : false;"><i class="fa fa-trash-o"></i></button>
+							      	{% endif %}
+						    	</div>
+						    </div>
+					  	</div>
 					</div>
-					<div class="panel-body">
-						<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-product" class="form-horizontal">
+				</div>
+				{# End Sidebar Actions #}
+				{# Main Panel #}
+				<div class="col-md-9 col-md-pull-3 col-sm-12">
+			    	<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title"><i class="fa fa-list"></i> {{ post_id ? entry_edit_post_text : entry_add_post_text }}</h3>
+						</div>
+						<div class="panel-body">
 							<ul class="nav nav-tabs">
 					            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
 					            <li><a href="#tab-seo" data-toggle="tab">{{ tab_seo }}</a></li>
@@ -174,6 +181,18 @@
 									                    </div>
 								                  	</div>
 								                  	{# end keyword #}
+								                  	{# post tags #}
+							                  		<div class="form-group">
+									                    <label class="col-sm-2 control-label" for="input-post-tag{{ language.language_id }}">
+									                    	<span data-toggle="tooltip" data-original-title="{{ entry_post_tag_description }}">
+									                    		{{ entry_post_tag }}
+									                    	</span>
+									                    </label>
+									                    <div class="col-sm-10">
+								                      		<input type="text" name="post_data[{{ language.language_id }}][tag]" value="{{ post_data[language.language_id] ? post_data[language.language_id].tag }}" placeholder="{{ entry_post_tag }}" id="input-post-tag{{ language.language_id }}" class="form-control" />
+									                    </div>
+								                  	</div>
+								                  	{# end post tags #}
 						              			</div>
 						              		{% endfor %}
 						              	</div>
@@ -213,11 +232,11 @@
 								</div>
 								{# end panel-seo #}
 							</div>
-						</form>
-		    		</div>
-		  		</div>
-			</div>
-			{# End Main Panel #}
+			    		</div>
+			  		</div>
+				</div>
+				{# End Main Panel #}
+			</form>
   		</div>
 	</div>
 </div>
