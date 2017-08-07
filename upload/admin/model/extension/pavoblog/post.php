@@ -5,7 +5,7 @@ class ModelExtensionPavoblogPost extends Model {
 	/**
 	 * get posts
 	 */
-	public function getPosts( $args = array() ) {
+	public function getAll( $args = array() ) {
 		$args = array_merge( $args, array(
 				'posts_per_page'	=> 10,
 				'paged'				=> 1,
@@ -57,7 +57,7 @@ class ModelExtensionPavoblogPost extends Model {
 	/**
 	 * get single post
 	 */
-	public function getPost( $post_id = null ) {
+	public function get( $post_id = null ) {
 		if ( ! $post_id ) {
 			trigger_error( sprintf( '%s was called. post_id is null', __FUNCTION__ ) );
 		}
@@ -70,7 +70,7 @@ class ModelExtensionPavoblogPost extends Model {
 	/**
 	 * create - update post
 	 */
-	public function updatePost( $args = array() ) {
+	public function update( $args = array() ) {
 		$args = array_merge( $args, array(
 				'ID'			=> 0,
 				'title'			=> '',
@@ -86,7 +86,7 @@ class ModelExtensionPavoblogPost extends Model {
 	/**
 	 * delete post
 	 */
-	public function deletePost( $post_id = null ) {
+	public function delete( $post_id = null ) {
 		if ( ! $post_id ) {
 			trigger_error( sprintf( '%s was called. post_id is NULL.', __FUNCTION__ ) );
 		}
