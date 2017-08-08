@@ -46,7 +46,7 @@ class ModelExtensionPavoblogPost extends Model {
 
 		// limit
 		if ( $posts_per_page && $paged ) {
-			$start = $paged == 1 ? 0 : $paged * $posts_per_page;
+			$start = ( $paged - 1 ) * $posts_per_page;
 			$sql .= " LIMIT {$start}, {$posts_per_page}";
 		}
 

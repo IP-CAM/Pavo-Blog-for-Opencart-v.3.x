@@ -11,8 +11,8 @@
 		</div>
   	</div>
   	<div class="container-fluid">
-		{% if error_warning %}
-		    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+		{% if errors.error_warning %}
+		    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ errors.error_warning }}
 	      		<button type="button" class="close" data-dismiss="alert">&times;</button>
 		    </div>
 	    {% endif %}
@@ -22,7 +22,7 @@
 		    </div>
 	    {% endif %}
 	    <div class="row">
-	    	<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-product" class="form-horizontal">
+	    	<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-post" class="form-horizontal">
 		    	{# Start Sidebar Actions #}
 				<div id="sidebar-upload" class="col-md-3 col-md-push-9 col-sm-12">
 					<div class="panel panel-default">
@@ -96,7 +96,7 @@
 						    	<div class="col-sm-offset-2 col-sm-10">
 						    		<button type="button" id="button-filter" class="btn btn-primary"><i class="fa fa-save"></i> {{ post_id ? update_button : save_button }}</button>
 							      	{% if ( post_id ) %}
-							      		<button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger form-control" onclick="confirm('{{ text_confirm }}') ? $('#form-upload').submit() : false;"><i class="fa fa-trash-o"></i></button>
+							      		<button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger form-control" onclick="confirm('{{ text_confirm }}') ? $('#form-post').submit() : false;"><i class="fa fa-trash-o"></i></button>
 							      	{% endif %}
 						    	</div>
 						    </div>
@@ -159,8 +159,8 @@
 									                    <label class="col-sm-2 control-label" for="input-meta-title{{ language.language_id }}">{{ entry_meta_title }}</label>
 									                    <div class="col-sm-10">
 									                      	<input type="text" name="post_data[{{ language.language_id }}][meta_title]" value="{{ post_data[language.language_id] ? post_data[language.language_id].meta_title }}" placeholder="{{ entry_meta_title }}" id="input-meta-title{{ language.language_id }}" class="form-control" />
-									                      	{% if error_meta_title[language.language_id] %}
-								                      			<div class="text-danger">{{ error_meta_title[language.language_id] }}</div>
+									                      	{% if errors[language.language_id] %}
+								                      			<div class="text-danger">{{ errors[language.language_id] }}</div>
 									                      	{% endif %}
 								                     	</div>
 								                  	</div>
@@ -201,7 +201,7 @@
 								{# end panel-general #}
 								{# panel-seo #}
 								<div class="tab-pane" id="tab-seo">
-									<div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ text_keyword }}</div>
+									<div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ entry_text_keyword }}</div>
 					              	<div class="table-responsive">
 						                <table class="table table-bordered table-hover">
 						                  	<thead>
@@ -217,10 +217,10 @@
 							                        <td class="text-left">
 							                        	{% for language in languages %}
 								                          	<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
-								                            	<input type="text" name="product_seo_url[{{ store.store_id }}][{{ language.language_id }}]" value="{% if product_seo_url[store.store_id][language.language_id] %}{{ product_seo_url[store.store_id][language.language_id] }}{% endif %}" placeholder="{{ entry_keyword }}" class="form-control" />
+								                            	<input type="text" name="post_seo_url[{{ store.store_id }}][{{ language.language_id }}]" value="{% if post_seo_url[store.store_id][language.language_id] %}{{ post_seo_url[store.store_id][language.language_id] }}{% endif %}" placeholder="{{ entry_keyword }}" class="form-control" />
 								                          	</div>
-								                          	{% if error_keyword[store.store_id][language.language_id] %}
-								                          		<div class="text-danger">{{ error_keyword[store.store_id][language.language_id] }}</div>
+								                          	{% if errors[store.store_id][language.language_id] %}
+								                          		<div class="text-danger">{{ errors[store.store_id][language.language_id] }}</div>
 								                          	{% endif %}
 							                          	{% endfor %}
 							                      	</td>

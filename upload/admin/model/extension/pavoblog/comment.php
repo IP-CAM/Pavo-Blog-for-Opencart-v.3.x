@@ -76,8 +76,8 @@ class ModelExtensionPavoblogComment extends Model {
 			$sql .= ' ORDER BY ' . $orderby . ' ' . $order;
 		}
 
-		if ( $comments_per_page ) {
-			$start = $paged * $comments_per_page;
+		if ( $comments_per_page && $paged ) {
+			$start = ( $paged - 1 ) * $comments_per_page;
 			$sql .= " LIMIT $start, $comments_per_page";
 		}
 

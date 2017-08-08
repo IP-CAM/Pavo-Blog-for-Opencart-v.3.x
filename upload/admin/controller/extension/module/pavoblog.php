@@ -132,6 +132,8 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	public function categories() {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/category' );
+		$this->load->model( 'localisation/language' );
+		$this->load->model( 'setting/store' );
 
 		/**
 		 * breadcrumbs data
@@ -146,9 +148,25 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			'href'      => $this->url->link( 'extension/module/pavoblog/categories', 'token=' . $this->session->data['user_token'].'&type=module', 'SSL' ),
       		'separator' => ' :: '
    		);
+   		$this->data['languages'] = $this->model_localisation_language->getLanguages();
+		$this->data['stores'][] = array(
+			'store_id' => 0,
+			'name'     => $this->language->get('text_default')
+		);
 
-		// comments
-   		$this->data['comments'] = $this->model_extension_pavoblog_category->getAll();
+		$stores = $this->model_setting_store->getStores();
+		foreach ($stores as $store) {
+			$this->data['stores'][] = array(
+				'store_id' => $store['store_id'],
+				'name'     => $store['name']
+			);
+		}
+
+   		// languages
+		$this->data['languages'] = $this->model_localisation_language->getLanguages();
+
+		// categories
+   		$this->data['categories'] = $this->model_extension_pavoblog_category->getAll();
 
 		// set page document title
 		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'categories_heading_title' ) );

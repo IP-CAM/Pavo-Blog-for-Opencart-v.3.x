@@ -45,9 +45,11 @@ $_['entry_enable_text'] = 'Enable';
 $_['entry_disable_text'] = 'Disable';
 $_['entry_date_added'] = 'Date added';
 $_['entry_post_name'] = 'Post Name';
+$_['entry_title_text'] = 'Title';
 $_['entry_author_title'] = 'Author';
 $_['entry_content'] = 'Content';
 $_['entry_featured'] = 'Featured';
+$_['entry_description'] = 'Description';
 $_['entry_short_description'] = 'Short Description';
 $_['entry_meta_title']		= 'Meta Tag Title';
 $_['entry_meta_description']= 'Meta Description';
@@ -58,11 +60,16 @@ $_['entry_yes_text'] = 'Yes';
 $_['entry_no_text'] = 'No';
 $_['entry_add_post_text'] = 'Add Post';
 $_['entry_edit_post_text'] = 'Edit Post';
+$_['entry_add_category_text'] = 'Add Category';
+$_['entry_edit_category_text'] = 'Edit Category';
+$_['entry_menu_class_text'] = 'Menu Class';
+
 //
-$_['text_keyword'] = 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';
+$_['entry_text_keyword'] = 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';
 $_['entry_store'] = 'Stores';
 $_['entry_keyword'] = 'Keyword';
-$_['email_text'] = 'Email';
+$_['entry_email_text'] = 'Email';
+$_['text_confirm'] = 'Are you sure?';
 
 // buttons
 $_['save_button'] = 'Save';
