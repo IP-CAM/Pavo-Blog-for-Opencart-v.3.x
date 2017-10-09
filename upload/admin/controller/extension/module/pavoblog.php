@@ -13,7 +13,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	/**
 	 * posts list
 	 */
-	public function posts() {
+	public function index() {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/post' );
 
@@ -59,7 +59,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->load->model( 'user/user' );
 
 		if ( $this->request->server['REQUEST_METHOD'] === 'POST' ) {
-			var_dump(1); die();
+			$this->model_extension_pavoblog_post->addPost( $this->request->post );
 		}
 
 		// languages
@@ -100,6 +100,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		}
 
 		$this->data['image'] = isset( $this->data['post']['image'] ) ? $this->data['post']['image'] : HTTPS_CATALOG . 'image/cache/catalog/opencart-logo-100x100.png';
+		$this->data['action'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true ) );
 
 		// users
 		$users = $this->model_user_user->getUsers();
@@ -132,9 +133,65 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	public function categories() {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/category' );
+
+		/**
+		 * breadcrumbs data
+		 */
+		$this->data['breadcrumbs'] = array();
+		$this->data['breadcrumbs'][] = array(
+			'text' => $this->language->get( 'text_home' ),
+			'href' => $this->url->link( 'common/dashboard', 'token=' . $this->session->data['user_token'], true )
+		);
+		$this->data['breadcrumbs'][] = array(
+       		'text'      => $this->language->get( 'menu_categories_text' ),
+			'href'      => $this->url->link( 'extension/module/pavoblog/categories', 'token=' . $this->session->data['user_token'].'&type=module', 'SSL' ),
+      		'separator' => ' :: '
+   		);
+
+		// categories
+   		$this->data['categories'] = $this->model_extension_pavoblog_category->getAll();
+   		$this->data['action']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'], true ) );
+   		$this->data['add_new_url']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true ) );
+
+		// set page document title
+		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'categories_heading_title' ) );
+		$this->data['errors'] = $this->errors;
+		$this->data = array_merge( array(
+			'header'		=> $this->load->controller( 'common/header' ),
+			'column_left' 	=> $this->load->controller( 'common/column_left' ),
+			'footer'		=> $this->load->controller( 'common/footer' )
+		), $this->data );
+
+		$this->response->setOutput( $this->load->view( 'extension/module/pavoblog/categories', $this->data ) );
+	}
+
+	/**
+	 * add - edit category
+	 */
+	public function category() {
+		$this->load->language( 'extension/module/pavoblog' );
+		$this->load->model( 'extension/pavoblog/category' );
 		$this->load->model( 'localisation/language' );
 		$this->load->model( 'setting/store' );
+		$this->load->model('tool/image');
 
+		if ( $this->request->server['REQUEST_METHOD'] === 'POST' && $this->validate( 'modify', 'extension/module/pavoblog/category' ) ) {
+			$id = isset( $this->request->post['category_id'] ) ? $this->request->post['category_id'] : 0;
+			if ( $id ) {
+				$this->model_extension_pavoblog_category->edit( $id, $this->request->post );
+			} else {
+				$id = $this->model_extension_pavoblog_category->add( $this->request->post );
+			}
+
+			if ( $id ) {
+				$this->response->redirect( $this->url->link( 'extension/module/pavoblog/category', 'id=' . $id . '&user_token=' . $this->session->data['user_token'], true ) ); exit();
+			} else {
+				$this->response->redirect( $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true ) ); exit();
+			}
+			$this->session->data['success'] = $this->language->get( 'text_success' );
+		}
+
+		$id = isset( $this->request->get['id'] ) ? $this->request->get['id'] : 0;
 		/**
 		 * breadcrumbs data
 		 */
@@ -164,10 +221,17 @@ class ControllerExtensionModulePavoBlog extends Controller {
 
    		// languages
 		$this->data['languages'] = $this->model_localisation_language->getLanguages();
+		$this->data['category'] = $this->model_extension_pavoblog_category->get( $id );
+		$this->data['category']['image'] = $this->data['category']['image'] ? $this->model_tool_image->resize( $this->data['category']['image'], 100, 100 ) : $this->model_tool_image->resize('no_image.png', 100, 100);
+		$this->data['category_data'] = array();
+		if ( $id ) {
+			$this->data['category_data'] = $this->model_extension_pavoblog_category->getCategoryDescription( $id );
+		}
 
 		// categories
    		$this->data['categories'] = $this->model_extension_pavoblog_category->getAll();
-
+   		$this->data['action']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true ) );
+		$this->data['back_url']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'], true ) );
 		// set page document title
 		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'categories_heading_title' ) );
 		$this->data['errors'] = $this->errors;
@@ -177,7 +241,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			'footer'		=> $this->load->controller( 'common/footer' )
 		), $this->data );
 
-		$this->response->setOutput( $this->load->view( 'extension/module/pavoblog/categories', $this->data ) );
+		$this->response->setOutput( $this->load->view( 'extension/module/pavoblog/category', $this->data ) );
 	}
 
 	/**
@@ -305,6 +369,13 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 		");
 
+		$this->db->query("
+				CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_post_to_store` (
+					`post_id` int(11) NOT NULL,
+					`store_id` int(11) NOT NULL
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+			");
+
 		// post description
 		$this->db->query("
 			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_post_description` (
@@ -328,6 +399,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			  `category_id` int(11) NOT NULL AUTO_INCREMENT,
 			  `image` varchar(255) DEFAULT NULL,
 			  `parent_id` int(11) NOT NULL DEFAULT '0',
+			  `column` int(3) NOT NULL DEFAULT '1',
 			  `status` tinyint(1) NOT NULL,
 			  `date_added` datetime NOT NULL,
 			  `date_modified` datetime NOT NULL,
@@ -350,6 +422,13 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			  KEY `name` (`name`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 		");
+
+		$this->db->query("
+				CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_category_to_store` (
+					`category_id` int(11) NOT NULL,
+					`store_id` int(11) NOT NULL
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+			");
 
 		// comment table
 		$this->db->query("

@@ -57,7 +57,7 @@ class ModelExtensionPavoblogPost extends Model {
 	/**
 	 * get single post
 	 */
-	public function get( $post_id = null ) {
+	public function getPost( $post_id = null ) {
 		if ( ! $post_id ) {
 			trigger_error( sprintf( '%s was called. post_id is null', __FUNCTION__ ) );
 		}
@@ -68,9 +68,10 @@ class ModelExtensionPavoblogPost extends Model {
 	}
 
 	/**
-	 * create - update post
+	 * add post
 	 */
-	public function update( $args = array() ) {
+	public function addPost( $args = array() ) {
+		var_dump($args); die();
 		$args = array_merge( $args, array(
 				'ID'			=> 0,
 				'title'			=> '',
@@ -81,6 +82,10 @@ class ModelExtensionPavoblogPost extends Model {
 		extract( $args );
 
 		return $this->db->getLastId();
+	}
+
+	public function editPost( $args = array() ) {
+
 	}
 
 	/**

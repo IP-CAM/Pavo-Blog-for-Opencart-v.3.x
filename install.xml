@@ -19,7 +19,7 @@
                 if ( $this->user->hasPermission( 'access', 'extension/module/pavoblog/posts' ) ) {
                     $settings[] = array(
                         'name'     => $this->language->get('menu_posts_text'),
-                        'href'     => $this->url->link('extension/module/pavoblog/posts', 'user_token=' . $this->session->data['user_token'], true),
+                        'href'     => $this->url->link('extension/module/pavoblog/index', 'user_token=' . $this->session->data['user_token'], true),
                         'children' => array()   
                     );
                 }

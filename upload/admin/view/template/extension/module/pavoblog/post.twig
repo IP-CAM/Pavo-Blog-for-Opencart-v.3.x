@@ -92,9 +92,9 @@
 						        	<button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
 						        </span>
 						    </div>
-						    <div class="form-group text-right">
+						    <div class="text-right">
 						    	<div class="col-sm-offset-2 col-sm-10">
-						    		<button type="button" id="button-filter" class="btn btn-primary"><i class="fa fa-save"></i> {{ post_id ? update_button : save_button }}</button>
+						    		<button type="submit" id="button-filter" form="form-post" class="btn btn-primary"><i class="fa fa-save"></i> {{ post_id ? update_button : save_button }}</button>
 							      	{% if ( post_id ) %}
 							      		<button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger form-control" onclick="confirm('{{ text_confirm }}') ? $('#form-post').submit() : false;"><i class="fa fa-trash-o"></i></button>
 							      	{% endif %}
@@ -150,7 +150,7 @@
 													<div class="form-group">
 								                    	<label class="col-sm-2 control-label" for="input-short-description{{ language.language_id }}">{{ entry_short_description }}</label>
 								                    	<div class="col-sm-10">
-								                      		<textarea name="post_data[{{ language.language_id }}][short_description]" rows="5" placeholder="{{ entry_short_description }}" id="input-short-description{{ language.language_id }}" class="form-control">{{ post_data[language.language_id] ? post_data[language.language_id].short_description }}</textarea>
+								                      		<textarea name="post_data[{{ language.language_id }}][description]" rows="5" placeholder="{{ entry_short_description }}" id="input-short-description{{ language.language_id }}" class="form-control">{{ post_data[language.language_id] ? post_data[language.language_id].description }}</textarea>
 								                    	</div>
 								                  	</div>
 								                  	{# end short description #}

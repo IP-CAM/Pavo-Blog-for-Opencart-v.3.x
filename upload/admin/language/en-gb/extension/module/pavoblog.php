@@ -13,8 +13,11 @@ $_['menu_settings_text'] 	= 'Settings';
 $_['menu_categories_text'] 	= 'Categories';
 $_['menu_tags_text'] 		= 'Tags';
 $_['menu_posts_text'] 		= 'Posts';
+$_['menu_add_new_text'] 	= 'Add New';
 $_['menu_post_add_new_text'] = 'Add Post';
 $_['menu_comments_text'] 	= 'Comments';
+
+$_['text_success']          = 'Success: You have modified attributes!';
 
 // posts
 $_['title_text']	= 'Title';
@@ -29,7 +32,7 @@ $_['created_text']	= 'Created At';
 $_['actions_text'] = 'Actions';
 $_['comments_text'] = 'Comments';
 $_['comment_text'] = 'Comment';
-
+$_['entry_column_text']	= 'Column(s)';
 // tabs
 $_['tab_general'] = 'General';
 $_['tab_seo'] = 'SEO';
