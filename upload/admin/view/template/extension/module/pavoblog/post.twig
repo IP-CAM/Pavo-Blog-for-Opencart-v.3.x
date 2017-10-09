@@ -36,11 +36,11 @@
 				                    	<tr>
 				                      		<td class="text-center">
 				                      			<a href="" id="thumb-image" data-toggle="image" class="img-thumbnail">
-				                      				{% if ( image ) %}
-				                      					<img src="{{ image }}" alt="" title="" data-placeholder="{{ placeholder }}" width="100" height="100" />
+				                      				{% if ( post.image ) %}
+				                      					<img src="{{ post.thumb }}" alt="" title="" data-placeholder="{{ placeholder }}" width="100" height="100" />
 				                      				{% endif %}
 				                      			</a>
-				                        		<input type="hidden" name="image" value="{{ image }}" id="input-image" />
+				                        		<input type="hidden" name="image" value="{{ post.image }}" id="input-image" />
 				                        	</td>
 				                    	</tr>
 				                  	</tbody>
@@ -77,22 +77,22 @@
 					  	<div class="panel-body">
 					  		<label class="control-label" for="input-featured">{{ entry_featured }}</label>
 							<select class="form-control" name="featured" id="input-featured">
-								<option value="1"{{ featured == 1 ? ' selected' : '' }}>{{ entry_yes_text }}</option>
-								<option value="0"{{ featured == 0 ? ' selected' : '' }}>{{ entry_no_text }}</option>
+								<option value="1"{{ post.featured == 1 ? ' selected' : '' }}>{{ entry_yes_text }}</option>
+								<option value="0"{{ post.featured == 0 ? ' selected' : '' }}>{{ entry_no_text }}</option>
 							</select>
 						    <label class="control-label" for="input-status">{{ entry_status_text }}</label>
 							<select class="form-control" name="status" id="input-status">
-								<option value="1"{{ status == 1 ? ' selected' : '' }}>{{ entry_enable_text }}</option>
-								<option value="0"{{ status == 0 ? ' selected' : '' }}>{{ entry_disable_text }}</option>
+								<option value="1"{{ post.status == 1 ? ' selected' : '' }}>{{ entry_enable_text }}</option>
+								<option value="0"{{ post.status == 0 ? ' selected' : '' }}>{{ entry_disable_text }}</option>
 							</select>
 						    <label class="control-label" for="input-date-added">{{ entry_date_added }}</label>
 					      	<div class="input-group date">
-						        <input type="text" name="filter_date_added" value="{{ filter_date_added }}" placeholder="{{ entry_date_added }}" data-date-format="YYYY-MM-DD" id="input-date-added" class="form-control" />
+						        <input type="text" name="date_added" value="{{ post.date_added }}" placeholder="{{ entry_date_added }}" data-date-format="YYYY-MM-DD" id="input-date-added" class="form-control" />
 						        <span class="input-group-btn">
 						        	<button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
 						        </span>
 						    </div>
-						    <div class="text-right">
+						    <div class="form-group text-right">
 						    	<div class="col-sm-offset-2 col-sm-10">
 						    		<button type="submit" id="button-filter" form="form-post" class="btn btn-primary"><i class="fa fa-save"></i> {{ post_id ? update_button : save_button }}</button>
 							      	{% if ( post_id ) %}
@@ -132,8 +132,8 @@
 									                    <label class="col-sm-2 control-label" for="input-name{{ language.language_id }}">{{ entry_post_name }}</label>
 									                    <div class="col-sm-10">
 															<input type="text" name="post_data[{{ language.language_id }}][name]" value="{{ post_data[language.language_id] ? post_data[language.language_id].name }}" placeholder="{{ entry_post_name }}" id="input-name{{ language.language_id }}" class="form-control" />
-															{% if errors[language.language_id] %}
-																<div class="text-danger">{{ errors[language.language_id] }}</div>
+															{% if errors.name[language.language_id] %}
+																<div class="text-danger">{{ errors.name[language.language_id] }}</div>
 															{% endif %}
 									                  	</div>
 								                  	</div>
@@ -159,8 +159,8 @@
 									                    <label class="col-sm-2 control-label" for="input-meta-title{{ language.language_id }}">{{ entry_meta_title }}</label>
 									                    <div class="col-sm-10">
 									                      	<input type="text" name="post_data[{{ language.language_id }}][meta_title]" value="{{ post_data[language.language_id] ? post_data[language.language_id].meta_title }}" placeholder="{{ entry_meta_title }}" id="input-meta-title{{ language.language_id }}" class="form-control" />
-									                      	{% if errors[language.language_id] %}
-								                      			<div class="text-danger">{{ errors[language.language_id] }}</div>
+									                      	{% if errors.meta_title[language.language_id] %}
+								                      			<div class="text-danger">{{ errors.meta_title[language.language_id] }}</div>
 									                      	{% endif %}
 								                     	</div>
 								                  	</div>
@@ -219,8 +219,8 @@
 								                          	<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
 								                            	<input type="text" name="post_seo_url[{{ store.store_id }}][{{ language.language_id }}]" value="{% if post_seo_url[store.store_id][language.language_id] %}{{ post_seo_url[store.store_id][language.language_id] }}{% endif %}" placeholder="{{ entry_keyword }}" class="form-control" />
 								                          	</div>
-								                          	{% if errors[store.store_id][language.language_id] %}
-								                          		<div class="text-danger">{{ errors[store.store_id][language.language_id] }}</div>
+								                          	{% if errors.keyword[store.store_id][language.language_id] %}
+								                          		<div class="text-danger">{{ errors.keyword[store.store_id][language.language_id] }}</div>
 								                          	{% endif %}
 							                          	{% endfor %}
 							                      	</td>

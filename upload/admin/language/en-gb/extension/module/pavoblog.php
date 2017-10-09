@@ -1,42 +1,46 @@
 <?php
 // Heading
-$_['heading_title']       	= 'PavoBlog';
-$_['posts_heading_title'] 	= 'Posts';
-$_['post_heading_title'] 	= 'Post';
+$_['heading_title']       		= 'PavoBlog';
+$_['posts_heading_title'] 		= 'Posts';
+$_['post_heading_title'] 		= 'Post';
 $_['comments_heading_title'] 	= 'Comments';
 $_['comment_heading_title'] 	= 'Comment';
 $_['categories_heading_title'] 	= 'Categories';
 $_['category_heading_title'] 	= 'Category';
+$_['entry_category_name_text']	= 'Category Name';
 
 // Menus
-$_['menu_settings_text'] 	= 'Settings';
-$_['menu_categories_text'] 	= 'Categories';
-$_['menu_tags_text'] 		= 'Tags';
-$_['menu_posts_text'] 		= 'Posts';
-$_['menu_add_new_text'] 	= 'Add New';
-$_['menu_post_add_new_text'] = 'Add Post';
-$_['menu_comments_text'] 	= 'Comments';
+$_['menu_settings_text'] 		= 'Settings';
+$_['menu_categories_text'] 		= 'Categories';
+$_['menu_tags_text'] 			= 'Tags';
+$_['menu_posts_text'] 			= 'Posts';
+$_['menu_add_new_text'] 		= 'Add New';
+$_['menu_post_add_new_text'] 	= 'Add Post';
+$_['menu_comments_text'] 		= 'Comments';
 
-$_['text_success']          = 'Success: You have modified attributes!';
+$_['text_success']          	= 'Success: You have modified attributes!';
 
 // posts
-$_['title_text']	= 'Title';
-$_['description_text']	= 'Description';
-$_['content_text']	= 'Content';
-$_['author_text']	= 'Author';
-$_['categories_text']	= 'Categories';
-$_['category_text']	= 'Category';
-$_['tags_text']	= 'Tags';
-$_['tag_text']	= 'Tag';
-$_['created_text']	= 'Created At';
-$_['actions_text'] = 'Actions';
-$_['comments_text'] = 'Comments';
-$_['comment_text'] = 'Comment';
+$_['title_text']				= 'Title';
+$_['description_text']			= 'Description';
+$_['content_text']				= 'Content';
+$_['author_text']				= 'Author';
+$_['categories_text']			= 'Categories';
+$_['category_text']				= 'Category';
+$_['tags_text']					= 'Tags';
+$_['tag_text']					= 'Tag';
+$_['created_text']				= 'Created At';
+$_['actions_text'] 				= 'Actions';
+$_['comments_text'] 			= 'Comments';
+$_['comment_text'] 				= 'Comment';
 $_['entry_column_text']	= 'Column(s)';
+$_['entry_author_text']	= 'Author';
+$_['entry_parent_text']	= 'Parent';
+$_['entry_featured_text']	= 'Featured';
 // tabs
 $_['tab_general'] = 'General';
 $_['tab_seo'] = 'SEO';
-$_['tab_image'] = 'Image';
+$_['tab_data'] = 'Data';
 
 // entries
 $_['entry_image_heading'] = 'Image';
@@ -77,3 +81,7 @@ $_['text_confirm'] = 'Are you sure?';
 // buttons
 $_['save_button'] = 'Save';
 $_['update_button'] = 'Update';
+
+// error
+$_['error_name']             = 'Attribute Name must be between 1 and 64 characters!';
+$_['error_meta_title']       = 'Meta Title must be greater than 1 and less than 255 characters!';

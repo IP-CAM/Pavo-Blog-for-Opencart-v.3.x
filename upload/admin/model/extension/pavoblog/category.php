@@ -45,8 +45,14 @@ class ModelExtensionPavoblogCategory extends Model {
 		}
 
 		$query = $this->db->query( $sql );
+		$results = array();
+		$language_id = $this->config->get( 'config_language_id' );
+		foreach ( $query->rows as $key => $row ) {
+			$data = $this->getCategoryDescription( $row['category_id'], $language_id );
+			$results[$key] = array_merge( $row, $data );
+		}
 
-		return $query->rows;
+		return $results;
 	}
 
 	/**
@@ -56,16 +62,52 @@ class ModelExtensionPavoblogCategory extends Model {
 	public function get( $category_id = null ) {
 		$sql = 'SELECT * FROM ' . DB_PREFIX . 'pavoblog_category AS category WHERE category_id = ' . $category_id;
 		$query = $this->db->query( $sql );
+
 		return $query->row;
 	}
 
-	public function getCategoryDescription( $category_id = null ) {
+	public function getCategoryDescription( $category_id = null, $language_id = null ) {
 		$sql = 'SELECT * FROM ' . DB_PREFIX . 'pavoblog_category_description WHERE category_id = ' . $category_id;
+		if ( $language_id ) {
+			$sql .= ' AND language_id = ' . $language_id;
+		}
 
 		$results = array();
 		$query = $this->db->query( $sql );
+		if ( $language_id ) return $query->row;
+
 		foreach ( $query->rows as $result) {
 			$results[$result['language_id'] ] = $result;
+		}
+
+		return $results;
+	}
+
+	public function getCategoryStore( $category_id = null ) {
+		$sql = 'SELECT store_id FROM ' . DB_PREFIX . 'pavoblog_category_to_store WHERE category_id = ' . $category_id;
+		$query = $this->db->query( $sql );
+		$results = array();
+		foreach ( $query->rows as $row ) {
+			$results[] = isset( $row['store_id'] ) ? $row['store_id'] : 0;
+		}
+		return $results;
+	}
+
+	public function getSeoUrlData( $category_id = null ) {
+		$sql = "SELECT * FROM " . DB_PREFIX . "seo_url WHERE query = 'pavo_cat_id=" . $category_id . "'";
+		$query = $this->db->query( $sql );
+		$results = array();
+
+		if ( $query->rows ) {
+			foreach ( $query->rows as $row ) {
+				$store_id = isset( $row['store_id'] ) ? $row['store_id'] : 0;
+				$language_id = isset( $row['language_id'] ) ? $row['language_id'] : 0;
+				if ( ! isset( $results[$store_id] ) ) {
+					$results[$store_id] = array();
+				}
+
+				$results[$store_id][$language_id] = isset( $row['keyword'] ) ? $row['keyword'] : '';
+			}
 		}
 
 		return $results;
@@ -122,8 +164,9 @@ class ModelExtensionPavoblogCategory extends Model {
 			'image' 	=> ! empty( $data['image'] ) 		? $this->db->escape( $data['image'] ) : '',
 			'parent_id' => ! empty( $data['parent_id'] ) 	? (int)$data['parent_id'] : 0,
 			'column' 	=> ! empty( $data['column'] ) 		? (int)$data['column'] : 1,
-			'status'	=> ! empty( $data['status'] ) 		? (int)$data['status'] : 1,
+			'status'	=> ! empty( $data['status'] ) 		? (int)$data['status'] : 0,
 		);
+
 		$sql = "UPDATE " . DB_PREFIX . "pavoblog_category SET `image` = '".$params['image']."', `parent_id` = '".$params['parent_id']."', `column` = '".$params['column']."', `status` = '".$params['status']."', `date_modified` = NOW() WHERE category_id = '".$category_id."'";
 		// excute query
 		$this->db->query( $sql );

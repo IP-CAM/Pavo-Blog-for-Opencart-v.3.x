@@ -36,43 +36,12 @@
 						<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-category" class="form-horizontal">
 							<ul class="nav nav-tabs">
 					            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+					            <li><a href="#tab-data" data-toggle="tab">{{ tab_data }}</a></li>
 					            <li><a href="#tab-seo" data-toggle="tab">{{ tab_seo }}</a></li>
 				          	</ul>
 							<div class="tab-content">
 								{# panel-general #}
 								<div class="tab-pane active" id="tab-general">
-									<div class="form-group">
-										<label class="col-sm-2 control-label" for="input-status">{{ entry_status_text }}</label>
-					                    <div class="col-sm-10">
-											<select class="form-control" name="status" id="input-status">
-												<option value="1"{{ category.status == 1 ? ' selected' : '' }}>{{ entry_enable_text }}</option>
-												<option value="0"{{ category.status == 0 ? ' selected' : '' }}>{{ entry_disable_text }}</option>
-											</select>
-					                  	</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-2 control-label" for="menu_class">{{ entry_menu_class_text }}</label>
-					                    <div class="col-sm-10">
-											<input type="text" name="menu_class" value="{{ category.menu_class ? category.menu_class : '' }}" placeholder="{{ entry_menu_class_text }}" id="menu_class" class="form-control" />
-					                  	</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-2 control-label" for="image">{{ entry_image_heading }}</label>
-					                    <div class="col-sm-10">
-											<a href="" id="thumb-image" data-toggle="image" class="img-thumbnail">
-			                      				{% if ( category.image ) %}
-			                      					<img src="{{ category.image }}" alt="" title="" data-placeholder="{{ placeholder }}" width="100" height="100" />
-			                      				{% endif %}
-			                      			</a>
-			                        		<input type="hidden" name="image" value="{{ image }}" id="input-image" />
-					                  	</div>
-									</div>
-									<div class="form-group">
-										<label class="col-sm-2 control-label" for="menu_class">{{ entry_column_text }}</label>
-					                    <div class="col-sm-10">
-											<input type="number" min="1" step="1" name="column" value="{{ category.column ? category.column : 4 }}" id="column" class="form-control" />
-					                  	</div>
-									</div>
 									{% if ( languages ) %}
 										<ul class="nav nav-tabs" id="language">
 							                {% for language in languages %}
@@ -88,8 +57,8 @@
 									                    <label class="col-sm-2 control-label" for="input-name{{ language.language_id }}">{{ entry_title_text }}</label>
 									                    <div class="col-sm-10">
 															<input type="text" name="category_data[{{ language.language_id }}][name]" value="{{ category_data[language.language_id] ? category_data[language.language_id].name }}" placeholder="{{ entry_post_name }}" id="input-name{{ language.language_id }}" class="form-control" />
-															{% if errors[language.language_id][name] %}
-																<div class="text-danger">{{ errors[language.language_id][name] }}</div>
+															{% if errors.name[language.language_id] %}
+																<div class="text-danger">{{ errors.name[language.language_id] }}</div>
 															{% endif %}
 									                  	</div>
 								                  	</div>
@@ -107,8 +76,8 @@
 									                    <label class="col-sm-2 control-label" for="input-meta-title{{ language.language_id }}">{{ entry_meta_title }}</label>
 									                    <div class="col-sm-10">
 									                      	<input type="text" name="category_data[{{ language.language_id }}][meta_title]" value="{{ category_data[language.language_id] ? category_data[language.language_id].meta_title }}" placeholder="{{ entry_meta_title }}" id="input-meta-title{{ language.language_id }}" class="form-control" />
-									                      	{% if errors[language.language_id] %}
-								                      			<div class="text-danger">{{ errors[language.language_id] }}</div>
+									                      	{% if errors.meta_title[language.language_id] %}
+								                      			<div class="text-danger">{{ errors.meta_title[language.language_id] }}</div>
 									                      	{% endif %}
 								                     	</div>
 								                  	</div>
@@ -135,6 +104,60 @@
 									{% endif %}
 								</div>
 								{# end panel-general #}
+								<div class="tab-pane" id="tab-data">
+									<div class="form-group">
+										<label class="col-sm-2 control-label" for="input-status">{{ entry_status_text }}</label>
+					                    <div class="col-sm-10">
+											<select class="form-control" name="status" id="input-status">
+												<option value="1"{{ category.status == 1 ? ' selected' : '' }}>{{ entry_enable_text }}</option>
+												<option value="0"{{ category.status == 0 ? ' selected' : '' }}>{{ entry_disable_text }}</option>
+											</select>
+					                  	</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label" for="input-status">{{ entry_parent_text }}</label>
+					                    <div class="col-sm-10">
+					                    	
+					                  	</div>
+									</div>
+									<div class="form-group">
+						                <label class="col-sm-2 control-label">{{ entry_store }}</label>
+						                <div class="col-sm-10">
+						                  	<div class="well well-sm" style="height: 100px; overflow: auto;">
+						                    	{% for store in stores %}
+						                    		<div class="checkbox">
+								                      	<label>
+									                        {% if store.store_id in category_store %}
+									                        	<input type="checkbox" name="category_store[]" value="{{ store.store_id }}" checked="checked" />
+									                        	{{ store.name }}
+									                        {% else %}
+									                        	<input type="checkbox" name="category_store[]" value="{{ store.store_id }}" />
+									                        	{{ store.name }}
+									                        {% endif %}
+								                      	</label>
+								                    </div>
+						                    	{% endfor %}
+						                  	</div>
+						                </div>
+					              	</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label" for="image">{{ entry_image_heading }}</label>
+					                    <div class="col-sm-10">
+											<a href="" id="thumb-image" data-toggle="image" class="img-thumbnail">
+			                      				{% if ( category.image ) %}
+			                      					<img src="{{ category.thumb }}" alt="" title="" data-placeholder="{{ placeholder }}" width="100" height="100" />
+			                      				{% endif %}
+			                      			</a>
+			                        		<input type="hidden" name="image" value="{{ category.image }}" id="input-image" />
+					                  	</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label" for="menu_class">{{ entry_column_text }}</label>
+					                    <div class="col-sm-10">
+											<input type="number" min="1" step="1" name="column" value="{{ category.column ? category.column : 4 }}" id="column" class="form-control" />
+					                  	</div>
+									</div>
+								</div>
 								{# panel-seo #}
 								<div class="tab-pane" id="tab-seo">
 									<div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ entry_text_keyword }}</div>
@@ -147,21 +170,21 @@
 						                    	</tr>
 						                  	</thead>
 						                  	<tbody>
-						                    {% for store in stores %}
-						                      	<tr>
-							                        <td class="text-left">{{ store.name }}</td>
-							                        <td class="text-left">
-							                        	{% for language in languages %}
-								                          	<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
-								                            	<input type="text" name="category_seo_url[{{ store.store_id }}][{{ language.language_id }}]" value="{% if category_seo_url[store.store_id][language.language_id] %}{{ category_seo_url[store.store_id][language.language_id] }}{% endif %}" placeholder="{{ entry_keyword }}" class="form-control" />
-								                          	</div>
-								                          	{% if error_keyword[store.store_id][language.language_id] %}
-								                          		<div class="text-danger">{{ error_keyword[store.store_id][language.language_id] }}</div>
-								                          	{% endif %}
-							                          	{% endfor %}
-							                      	</td>
-						                      	</tr>
-						                    {% endfor %}
+							                    {% for store in stores %}
+							                      	<tr>
+								                        <td class="text-left">{{ store.name }}</td>
+								                        <td class="text-left">
+								                        	{% for language in languages %}
+									                          	<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+									                            	<input type="text" name="category_seo_url[{{ store.store_id }}][{{ language.language_id }}]" value="{% if category_seo_url[store.store_id][language.language_id] %}{{ category_seo_url[store.store_id][language.language_id] }}{% endif %}" placeholder="{{ entry_keyword }}" class="form-control" />
+									                          	</div>
+									                          	{% if errors.keyword[store.store_id][language.language_id] %}
+									                          		<div class="text-danger">{{ errors.keyword[store.store_id][language.language_id] }}</div>
+									                          	{% endif %}
+								                          	{% endfor %}
+								                      	</td>
+							                      	</tr>
+							                    {% endfor %}
 						                  	</tbody>
 						                </table>
 					              	</div>

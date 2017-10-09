@@ -58,11 +58,13 @@ class ModelExtensionPavoblogPost extends Model {
 	 * get single post
 	 */
 	public function getPost( $post_id = null ) {
-		if ( ! $post_id ) {
-			trigger_error( sprintf( '%s was called. post_id is null', __FUNCTION__ ) );
-		}
+		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_post WHERE post_id = " . $post_id;
+		$query = $this->db->query( $sql );
+		return $query->rows;
+	}
 
-		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_post WHERE ID = " . $post_id;
+	public function getPostData( $post_id = null ) {
+		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_post_description WHERE post_id =" . $post_id;
 		$query = $this->db->query( $sql );
 		return $query->rows;
 	}
@@ -70,32 +72,113 @@ class ModelExtensionPavoblogPost extends Model {
 	/**
 	 * add post
 	 */
-	public function addPost( $args = array() ) {
-		var_dump($args); die();
-		$args = array_merge( $args, array(
-				'ID'			=> 0,
-				'title'			=> '',
-				'user_id'		=> 0,
-				'created_at'	=> '',
-				'updated_at'	=> ''
+	public function addPost( $data = array() ) {
+		$data = array_merge( $args, array(
+				'post_id'			=> 0,
+				'name'				=> '',
+				'image'				=> '',
+				'user_id'			=> 1,
+				'description'		=> '',
+				'content'			=> '',
+				'tag'				=> '',
+				'date_added'		=> '',
+				'dated_modifed'		=> '',
+				'post_data'			=> array(),
+				'post_seo_url'		=> array(),
+				'post_store'	=> array()
 			) );
-		extract( $args );
 
-		return $this->db->getLastId();
+		extract( $data );
+		$sql = "INSERT INTO " . DB_PREFIX . "pavoblog_post (`image`, `viewed`, `status`, `featured`, `user_id`, `date_added`, `date_modified`)";
+		$sql .= " VALUES ( '". $this->db->escape( $image ) ."', '".(int)$viewed."', '".(int)$status."', '".(int)$featured."', '".(int)$user_id."', NOW(), NOW() )";
+
+		$this->db->query( $sql );
+		$post_id = $this->db->getLastId();
+
+		if ( $post_id ) {
+			foreach ( $post_data as $language_id => $data ) {
+				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_description SET post_id = '" . (int)$post_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape( $name ) . "', description = '" . $this->db->escape( $description ) . "', content = '" . $this->db->escape( $content ) . "', tag = '" . $this->db->escape( $tag ) . "', meta_title = '" . $this->db->escape( $meta_title ) . "', meta_description = '" . $this->db->escape( $meta_description ) . "', meta_keyword = '" . $this->db->escape( $meta_keyword ) . "'");
+			}
+		}
+
+		if ( $post_store ) {
+			foreach ( $post_store as $store_id ) {
+				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_to_store SET post_id = '" . (int)$post_id . "', store_id = '" . (int)$store_id . "'");
+			}
+		}
+
+		if ( $post_seo_url ) {
+			foreach ( $post_seo_url as $store_id => $language ) {
+				foreach ($language as $language_id => $keyword) {
+					if ( ! empty( $keyword )) {
+						$this->db->query("INSERT INTO " . DB_PREFIX . "seo_url SET store_id = '" . (int)$store_id . "', language_id = '" . (int)$language_id . "', query = 'pavo_post_id=" . (int)$post_id . "', keyword = '" . $this->db->escape($keyword) . "'");
+					}
+				}
+			}
+		}
+
+		$this->cache->delete('pavoblog_post');
+
+		return $post_id;
 	}
 
-	public function editPost( $args = array() ) {
+	public function editPost( $post_id = null, $data = array() ) {
+		$data = array_merge( array(
+				'post_id'			=> 0,
+				'name'				=> '',
+				'image'				=> '',
+				'user_id'			=> 1,
+				'description'		=> '',
+				'content'			=> '',
+				'tag'				=> '',
+				'date_added'		=> '',
+				'dated_modifed'		=> '',
+				'post_data'			=> array(),
+				'post_seo_url'		=> array(),
+				'post_store'		=> array()
+			), $data );
 
+		extract( $data );
+
+		$sql = "UPDATE " . DB_PREFIX . "pavoblog_post SET `image` = '".$image."', `viewd` = '".$viewd."', `status` = '".$status."', `featured` = '".$featured."', description = '" . $this->db->escape( $description ) . "', content = '" . $this->db->escape( $content ) . "', `tag` = '".$this->db->escape( $tag )."' , `user_id` = '".$user_id."', `date_added` = '".$date_added."', `date_modified` = NOW() WHERE post_id = '".$post_id."'";
+		// excute query
+		$this->db->query( $sql );
+
+		// category description
+		$this->db->query("DELETE FROM " . DB_PREFIX . "pavoblog_post_description WHERE post_id = '" . (int)$post_id . "'");
+		// category data
+		foreach ( $data['post_data'] as $language_id => $value ) {
+			$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_description SET post_id = '" . (int)$post_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', description = '" . $this->db->escape($value['description']) . "', content = '" . $this->db->escape($value['content']) . "', tag = '" . $this->db->escape($value['tag']) . "', meta_title = '" . $this->db->escape($value['meta_title']) . "', meta_description = '" . $this->db->escape($value['meta_description']) . "', meta_keyword = '" . $this->db->escape($value['meta_keyword']) . "'");
+		}
+
+		// category to store
+		$this->db->query("DELETE FROM " . DB_PREFIX . "pavoblog_post_to_store WHERE post_id = '" . (int)$post_id . "'");
+		if (isset($data['post_store'])) {
+			foreach ( $data['post_store'] as $store_id ) {
+				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_to_store SET post_id = '" . (int)$post_id . "', store_id = '" . (int)$store_id . "'");
+			}
+		}
+
+		$this->db->query("DELETE FROM " . DB_PREFIX . "seo_url WHERE query = 'pavo_post_id" . (int)$post_id . "'");
+		if (isset($data['category_seo_url'])) {
+			foreach ($data['category_seo_url'] as $store_id => $language) {
+				foreach ($language as $language_id => $keyword) {
+					if ( ! empty( $keyword )) {
+						$this->db->query("INSERT INTO " . DB_PREFIX . "seo_url SET store_id = '" . (int)$store_id . "', language_id = '" . (int)$language_id . "', query = 'pavo_post_id=" . (int)$post_id . "', keyword = '" . $this->db->escape($keyword) . "'");
+					}
+				}
+			}
+		}
+
+		$this->cache->delete('pavoblog_post');
+
+		return $post_id;
 	}
 
 	/**
 	 * delete post
 	 */
 	public function delete( $post_id = null ) {
-		if ( ! $post_id ) {
-			trigger_error( sprintf( '%s was called. post_id is NULL.', __FUNCTION__ ) );
-		}
-
 		$sql = "DELETE FROM " . DB_PREFIX . "pavoblog_post WHERE ID = " . $post_id;
 		$this->db->query( $sql );
 
