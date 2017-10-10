@@ -74,6 +74,10 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			}
 		}
 
+		if ( ! empty( $this->session->data['success'] ) ) {
+			$this->data['success'] = $this->session->data['success'];
+			unset( $this->session->data['success'] );
+		}
 		// languages
 		$this->data['languages'] = $this->model_localisation_language->getLanguages();
 		$this->data['users'] = array();
@@ -107,20 +111,41 @@ class ControllerExtensionModulePavoBlog extends Controller {
 
 		// posts
 		$this->data['post'] = $post_id ? $this->model_extension_pavoblog_post->getPost( $post_id ) : array();
+		$this->data['post']['date_added'] = isset( $this->data['post']['date_added'] ) ? date( 'Y-m-d', strtotime( $this->data['post']['date_added'] ) ) : date( 'Y-m-d' );
 		$this->data['post']['thumb'] = ! empty( $this->data['post']['image'] ) ? $this->model_tool_image->resize( $this->data['post']['image'], 100, 100 ) : $this->model_tool_image->resize( 'no_image.png', 100, 100);
 		if ( ! isset( $this->data['post']['user_id'] ) ) {
 			$this->data['post']['user_id'] = $this->session->data['user_id'];
 		}
-		$this->data['post_data'] = $this->model_extension_pavoblog_post->getPostData( $post_id );
 
-		$this->data['image'] = isset( $this->data['post']['image'] ) ? $this->data['post']['image'] : HTTPS_CATALOG . 'image/cache/catalog/opencart-logo-100x100.png';
+		$this->data['post_data'] = array();
+		if ( ! empty( $this->request->post['post_data'] ) ) {
+			$this->data['post_data'] = $this->request->post['post_data'];
+		} else if ( $post_id ) {
+			$this->data['post_data'] = $this->model_extension_pavoblog_post->getPostData( $post_id );
+		}
+
+		$this->data['post_store'] = array();
+		if ( ! empty( $this->request->post['post_store'] ) ) {
+			$this->data['post_store'] = $this->request->post['post_store'];
+		} else if ( $post_id ) {
+			$this->data['post_store'] = $post_id ? $this->model_extension_pavoblog_post->getPostStore( $post_id ) : array();
+		}
+
+		$this->data['post_seo_url'] = array();
+		if ( ! empty( $this->request->post['post_seo_url'] ) ) {
+			$this->data['post_seo_url'] = $this->request->post['post_seo_url'];
+		} else if ( $post_id ) {
+			$this->data['post_seo_url'] = $this->model_extension_pavoblog_post->getSeoUrlData( $post_id );
+		}
+
+		$this->data['thumb'] = isset( $this->data['post']['image'] ) ? $this->data['post']['image'] : HTTPS_CATALOG . 'image/cache/catalog/opencart-logo-100x100.png';
 		$this->data['action'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true ) );
 
 		$action_url = $this->url->link( 'extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true );
    		if ( $post_id ) {
    			$action_url = $this->url->link( 'extension/module/pavoblog/post', 'post_id='.$post_id.'&user_token=' . $this->session->data['user_token'], true );
    		}
-   		$this->data['action']	= str_replace( '&amp;', '&', $action_url );
+   		$this->data['action'] = str_replace( '&amp;', '&', $action_url );
 
 		// users
 		$users = $this->model_user_user->getUsers();
@@ -202,20 +227,25 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->load->model( 'setting/store' );
 		$this->load->model( 'tool/image' );
 
-		$id = isset( $this->request->get['id'] ) ? $this->request->get['id'] : 0;
+		$category_id = isset( $this->request->get['category_id'] ) ? $this->request->get['category_id'] : 0;
 		if ( $this->request->server['REQUEST_METHOD'] === 'POST' && $this->validateCategoryForm() ) {
-			if ( $id ) {
-				$this->model_extension_pavoblog_category->edit( $id, $this->request->post );
+			if ( $category_id ) {
+				$this->model_extension_pavoblog_category->edit( $category_id, $this->request->post );
 			} else {
-				$id = $this->model_extension_pavoblog_category->add( $this->request->post );
+				$category_id = $this->model_extension_pavoblog_category->add( $this->request->post );
 			}
 			$this->session->data['success'] = $this->language->get( 'text_success' );
 
-			if ( $id ) {
-				$this->response->redirect( $this->url->link( 'extension/module/pavoblog/category', 'id=' . $id . '&user_token=' . $this->session->data['user_token'], true ) ); exit();
+			if ( $category_id ) {
+				$this->response->redirect( $this->url->link( 'extension/module/pavoblog/category', 'category_id=' . $category_id . '&user_token=' . $this->session->data['user_token'], true ) ); exit();
 			} else {
 				$this->response->redirect( $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true ) ); exit();
 			}
+		}
+
+		if ( ! empty( $this->session->data['success'] ) ) {
+			$this->data['success'] = $this->session->data['success'];
+			unset( $this->session->data['success'] );
 		}
 
 		/**
@@ -247,20 +277,31 @@ class ControllerExtensionModulePavoBlog extends Controller {
 
    		// languages
 		$this->data['languages'] = $this->model_localisation_language->getLanguages();
-		$this->data['category'] = $this->model_extension_pavoblog_category->get( $id );
+		$this->data['category'] = $this->model_extension_pavoblog_category->get( $category_id );
 
-		$this->data['category_data'] = $id ? $this->model_extension_pavoblog_category->getCategoryDescription( $id ) : array();
-		$this->data['category_seo_url'] = $id ? $this->model_extension_pavoblog_category->getSeoUrlData( $id ) : array();
+		$this->data['category_data'] = array();
+		if ( ! empty( $this->request->post['category_data'] ) ) {
+			$this->data['category_data'] = $this->request->post['category_data'];
+		} else if ( $category_id ) {
+			$this->data['category_data'] = $this->model_extension_pavoblog_category->getCategoryDescription( $category_id );
+		}
 
-		$this->data['category']['thumb'] = ! empty( $this->data['category']['image'] ) ? $this->model_tool_image->resize( $this->data['category']['image'], 100, 100 ) : $this->model_tool_image->resize( 'no_image.png', 100, 100);
-		$this->data['category_store'] = $id ? $this->model_extension_pavoblog_category->getCategoryStore( $id ) : array();
+		$this->data['category_seo_url'] = array();
+		if ( ! empty( $this->request->post['category_seo_url'] ) ) {
+			$this->data['category_seo_url'] = $this->request->post['category_seo_url'];
+		} else if ( $category_id ) {
+			$this->data['category_seo_url'] = $this->model_extension_pavoblog_category->getSeoUrlData( $category_id );
+		}
+
+		$this->data['category']['thumb'] 	= ! empty( $this->data['category']['image'] ) ? $this->model_tool_image->resize( $this->data['category']['image'], 100, 100 ) : $this->model_tool_image->resize( 'no_image.png', 100, 100);
+		$this->data['category_store'] 		= $category_id ? $this->model_extension_pavoblog_category->getCategoryStore( $category_id ) : array();
 
 		// categories
    		$this->data['categories'] = $this->model_extension_pavoblog_category->getAll();
 
    		$action_url = $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true );
-   		if ( $id ) {
-   			$action_url = $this->url->link( 'extension/module/pavoblog/category', 'id='.$id.'&user_token=' . $this->session->data['user_token'], true );
+   		if ( $category_id ) {
+   			$action_url = $this->url->link( 'extension/module/pavoblog/category', 'category_id='.$category_id.'&user_token=' . $this->session->data['user_token'], true );
    		}
    		$this->data['action']	= str_replace( '&amp;', '&', $action_url );
 		$this->data['back_url']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'], true ) );

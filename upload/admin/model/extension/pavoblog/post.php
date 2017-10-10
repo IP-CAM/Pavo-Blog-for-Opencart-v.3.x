@@ -60,21 +60,24 @@ class ModelExtensionPavoblogPost extends Model {
 	public function getPost( $post_id = null ) {
 		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_post WHERE post_id = " . $post_id;
 		$query = $this->db->query( $sql );
-		return $query->rows;
+		return $query->row;
 	}
 
 	public function getPostData( $post_id = null ) {
 		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_post_description WHERE post_id =" . $post_id;
 		$query = $this->db->query( $sql );
-		return $query->rows;
+		$results = array();
+		if ( $query->rows ) foreach ( $query->rows as $row ) {
+			$results[$row['language_id']] = $row;
+		}
+		return $results;
 	}
 
 	/**
 	 * add post
 	 */
 	public function addPost( $data = array() ) {
-		$data = array_merge( $args, array(
-				'post_id'			=> 0,
+		$data = array_merge( array(
 				'name'				=> '',
 				'image'				=> '',
 				'user_id'			=> 1,
@@ -85,25 +88,25 @@ class ModelExtensionPavoblogPost extends Model {
 				'dated_modifed'		=> '',
 				'post_data'			=> array(),
 				'post_seo_url'		=> array(),
-				'post_store'	=> array()
-			) );
+				'post_store'		=> array()
+			), $data );
 
 		extract( $data );
 		$sql = "INSERT INTO " . DB_PREFIX . "pavoblog_post (`image`, `viewed`, `status`, `featured`, `user_id`, `date_added`, `date_modified`)";
-		$sql .= " VALUES ( '". $this->db->escape( $image ) ."', '".(int)$viewed."', '".(int)$status."', '".(int)$featured."', '".(int)$user_id."', NOW(), NOW() )";
+		$sql .= " VALUES ( '". $this->db->escape( $image ) ."', '".(int)$viewed."', '".(int)$status."', '".(int)$featured."', '".(int)$user_id."', '".$date_added ? $this->db->escape( $date_added ) : 'NOW()'."', NOW() )";
 
 		$this->db->query( $sql );
 		$post_id = $this->db->getLastId();
 
 		if ( $post_id ) {
 			foreach ( $post_data as $language_id => $data ) {
-				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_description SET post_id = '" . (int)$post_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape( $name ) . "', description = '" . $this->db->escape( $description ) . "', content = '" . $this->db->escape( $content ) . "', tag = '" . $this->db->escape( $tag ) . "', meta_title = '" . $this->db->escape( $meta_title ) . "', meta_description = '" . $this->db->escape( $meta_description ) . "', meta_keyword = '" . $this->db->escape( $meta_keyword ) . "'");
+				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_description SET `post_id` = " . (int)$post_id . ", `language_id` = '" . (int)$language_id . "', `name` = '" . $this->db->escape( $name ) . "', `description` = '" . $this->db->escape( $description ) . "', `content` = '" . $this->db->escape( $content ) . "', `tag` = '" . $this->db->escape( $tag ) . "', `meta_title` = '" . $this->db->escape( $meta_title ) . "', `meta_description` = '" . $this->db->escape( $meta_description ) . "', `meta_keyword` = '" . $this->db->escape( $meta_keyword ) . "'");
 			}
 		}
 
 		if ( $post_store ) {
 			foreach ( $post_store as $store_id ) {
-				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_to_store SET post_id = '" . (int)$post_id . "', store_id = '" . (int)$store_id . "'");
+				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_to_store SET `post_id` = " . (int)$post_id . ", `store_id` = '" . (int)$store_id . "'");
 			}
 		}
 
@@ -124,7 +127,6 @@ class ModelExtensionPavoblogPost extends Model {
 
 	public function editPost( $post_id = null, $data = array() ) {
 		$data = array_merge( array(
-				'post_id'			=> 0,
 				'name'				=> '',
 				'image'				=> '',
 				'user_id'			=> 1,
@@ -133,6 +135,7 @@ class ModelExtensionPavoblogPost extends Model {
 				'tag'				=> '',
 				'date_added'		=> '',
 				'dated_modifed'		=> '',
+				'viewed'			=> '',
 				'post_data'			=> array(),
 				'post_seo_url'		=> array(),
 				'post_store'		=> array()
@@ -140,7 +143,16 @@ class ModelExtensionPavoblogPost extends Model {
 
 		extract( $data );
 
-		$sql = "UPDATE " . DB_PREFIX . "pavoblog_post SET `image` = '".$image."', `viewd` = '".$viewd."', `status` = '".$status."', `featured` = '".$featured."', description = '" . $this->db->escape( $description ) . "', content = '" . $this->db->escape( $content ) . "', `tag` = '".$this->db->escape( $tag )."' , `user_id` = '".$user_id."', `date_added` = '".$date_added."', `date_modified` = NOW() WHERE post_id = '".$post_id."'";
+		$sql = "UPDATE " . DB_PREFIX . "pavoblog_post SET `image` = '".$image."', `status` = '".$status."', `featured` = '".$featured."', `user_id` = '".$user_id."', `date_modified` = NOW()";
+
+		if ( $date_added ) {
+			$sql .= ", `date_added` = '".$date_added."'";
+		}
+		if ( $viewed ) {
+			$sql .= ", `viewed` = '".$viewed."'";
+		}
+
+		$sql .= " WHERE post_id = ".(int) $post_id."";
 		// excute query
 		$this->db->query( $sql );
 
@@ -160,8 +172,8 @@ class ModelExtensionPavoblogPost extends Model {
 		}
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "seo_url WHERE query = 'pavo_post_id" . (int)$post_id . "'");
-		if (isset($data['category_seo_url'])) {
-			foreach ($data['category_seo_url'] as $store_id => $language) {
+		if (isset($data['post_seo_url'])) {
+			foreach ($data['post_seo_url'] as $store_id => $language) {
 				foreach ($language as $language_id => $keyword) {
 					if ( ! empty( $keyword )) {
 						$this->db->query("INSERT INTO " . DB_PREFIX . "seo_url SET store_id = '" . (int)$store_id . "', language_id = '" . (int)$language_id . "', query = 'pavo_post_id=" . (int)$post_id . "', keyword = '" . $this->db->escape($keyword) . "'");
@@ -183,6 +195,36 @@ class ModelExtensionPavoblogPost extends Model {
 		$this->db->query( $sql );
 
 		return $this->db->getLastId();
+	}
+
+	public function getPostStore( $post_id = null ) {
+		$sql = 'SELECT store_id FROM ' . DB_PREFIX . 'pavoblog_post_to_store WHERE post_id = ' . $post_id;
+		$query = $this->db->query( $sql );
+		$results = array();
+		foreach ( $query->rows as $row ) {
+			$results[] = isset( $row['store_id'] ) ? $row['store_id'] : 0;
+		}
+		return $results;
+	}
+
+	public function getSeoUrlData( $post_id = null ) {
+		$sql = "SELECT * FROM " . DB_PREFIX . "seo_url WHERE query = 'pavo_post_id=" . $post_id . "'";
+		$query = $this->db->query( $sql );
+		$results = array();
+
+		if ( $query->rows ) {
+			foreach ( $query->rows as $row ) {
+				$store_id = isset( $row['store_id'] ) ? $row['store_id'] : 0;
+				$language_id = isset( $row['language_id'] ) ? $row['language_id'] : 0;
+				if ( ! isset( $results[$store_id] ) ) {
+					$results[$store_id] = array();
+				}
+
+				$results[$store_id][$language_id] = isset( $row['keyword'] ) ? $row['keyword'] : '';
+			}
+		}
+
+		return $results;
 	}
 
 }
