@@ -1,6 +1,8 @@
 <?php
 // Heading
 $_['heading_title']       		= 'PavoBlog';
+$_['setting_title']       		= 'PavoBlog Settings';
+$_['edit_settings']				= 'Edit Settings';
 $_['posts_heading_title'] 		= 'Posts';
 $_['post_heading_title'] 		= 'Post';
 $_['comments_heading_title'] 	= 'Comments';
@@ -8,7 +10,6 @@ $_['comment_heading_title'] 	= 'Comment';
 $_['categories_heading_title'] 	= 'Categories';
 $_['category_heading_title'] 	= 'Category';
 $_['entry_category_name_text']	= 'Category Name';
-$_['error_unique']           	= 'SEO URL must be unique!';
 
 // Menus
 $_['menu_settings_text'] 		= 'Settings';
@@ -19,8 +20,15 @@ $_['menu_add_new_text'] 		= 'Add New';
 $_['menu_post_add_new_text'] 	= 'Add Post';
 $_['menu_comments_text'] 		= 'Comments';
 
+// text
 $_['text_success']          	= 'Success: You have modified attributes!';
-$_['error_warning']          	= 'Warning: Please check the form carefully for errors!';
+$_['text_general']				= 'General';
+$_['text_images']				= 'Images';
+$_['text_posts']				= 'Posts';
+$_['text_width']				= 'Width';
+$_['text_height']				= 'Height';
+$_['edit_text']					= 'Edit';
+
 // posts
 $_['title_text']				= 'Title';
 $_['description_text']			= 'Description';
@@ -72,6 +80,13 @@ $_['entry_edit_post_text'] 		= 'Edit Post';
 $_['entry_add_category_text'] 	= 'Add Category';
 $_['entry_edit_category_text'] 	= 'Edit Category';
 $_['entry_menu_class_text'] 	= 'Menu Class';
+$_['entry_default_items']		= 'Default Items Per Page';
+$_['entry_default_items_title']	= 'Determines how many catalog posts are shown per page';
+$_['entry_default_items_plc']	= 'Default Items Per Page';
+$_['entry_desc_limit']			= 'List Description Limit';
+$_['entry_limit_desc_title']	= 'In the list view, short description character limit (categories, posts etc)';
+$_['entry_desc_limit_plc']		= 'List Description Limit';
+$_['entry_post_image_thumb']	= 'Post Image Thumb Size (W x H)';
 
 //
 $_['entry_text_keyword'] 		= 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';
@@ -85,5 +100,11 @@ $_['save_button'] 				= 'Save';
 $_['update_button'] 			= 'Update';
 
 // error
+$_['error_unique']           	= 'SEO URL must be unique!';
+$_['error_warning']          	= 'Warning: Please check the form carefully for errors!';
 $_['error_name']             	= 'Attribute Name must be between 1 and 64 characters!';
 $_['error_meta_title']       	= 'Meta Title must be greater than 1 and less than 255 characters!';
+$_['error_pavoblog_post_limit']	= 'Items Per Page is required!';
+$_['error_pavoblog_post_description_length']	= 'Post Description Limit required!';
+$_['error_pavoblog_image_thumb_width']	= 'Thumbnail Size Width dimensions required!';
+$_['error_pavoblog_image_thumb_height']	= 'Thumbnail Size Height dimensions required!';

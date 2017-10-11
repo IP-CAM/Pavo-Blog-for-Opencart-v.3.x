@@ -6,29 +6,33 @@ class ModelExtensionPavoblogCategory extends Model {
 	 * get all categories with args
 	 */
 	public function getAll( $args = array() ) {
-		$args = array_merge( $args, array(
+		$args = array_merge( array(
 				'parent_id'		=> '',
 				'status'		=> '',
 				'order'			=> 'ASC',
 				'orderby'		=> 'category_id',
-				'categories_per_page'	=> 10,
-				'paged'			=> 1
-			) );
+				'start'			=> 0,
+				'limit'			=> $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10,
+				'language_id'	=> $this->config->get( 'config_language_id' )
+			), $args );
 
 		extract( $args );
 
-		$select = 'SELECT * FROM ' . DB_PREFIX . 'pavoblog_category AS category';
-		$join = $where = array();
+		$select = 'SELECT SQL_CALC_FOUND_ROWS * FROM ' . DB_PREFIX . 'pavoblog_category AS category';
+		$join = '';
+		$where = array();
+
+		$join .= ' LEFT JOIN ' . DB_PREFIX . 'pavoblog_category_description AS catdesc ON catdesc.category_id = category.category_id AND catdesc.language_id = ' . $language_id;
 
 		if ( $parent_id ) {
-			$where[] = 'category.parent_id = ' . $parent_id;
+			$parent_id = ! is_array( $parent_id ) ? array( $parent_id ) : $parent_id;
+			$where[] = 'category.parent_id IN ('.implode( '\' ', $parent_id ).') ';
 		}
 
 		if ( $status != '' ) {
 			$where[] = ' category.status = ' . $status;
 		}
 
-		$join = implode( '', $join );
 		$where = implode( 'AND ', $where );
 		$sql = "$select $join";
 		if ( $where ) {
@@ -36,23 +40,24 @@ class ModelExtensionPavoblogCategory extends Model {
 		}
 
 		if ( $order && $orderby ) {
-			$sql .= ' ORDER BY ' . $orderby . ' ' . $order;
+			$sql .= ' ORDER BY category.' . $orderby . ' ' . $order;
 		}
 
-		if ( $categories_per_page != -1 ) {
-			$start = ( $paged - 1 ) * $categories_per_page;
-			$sql .= ' LIMIT ' . $start . ', ' . $categories_per_page;
+		if ( $limit != -1 ) {
+			$sql .= ' LIMIT ' . $start . ', ' . $limit;
 		}
 
 		$query = $this->db->query( $sql );
-		$results = array();
-		$language_id = $this->config->get( 'config_language_id' );
-		foreach ( $query->rows as $key => $row ) {
-			$data = $this->getCategoryDescription( $row['category_id'], $language_id );
-			$results[$key] = array_merge( $row, $data );
-		}
 
-		return $results;
+		return $query->rows;
+	}
+
+	public function getTotals() {
+		$query = $this->db->query( 'SELECT FOUND_ROWS()' );
+		if ( $query->row && isset( $query->row['FOUND_ROWS()'] ) ) {
+			return (int)$query->row['FOUND_ROWS()'];
+		}
+		return 0;
 	}
 
 	/**
@@ -186,7 +191,7 @@ class ModelExtensionPavoblogCategory extends Model {
 			}
 		}
 
-		$this->db->query("DELETE FROM " . DB_PREFIX . "seo_url WHERE query = 'pavo_cat_id" . (int)$category_id . "'");
+		$this->db->query("DELETE FROM " . DB_PREFIX . "seo_url WHERE query = 'pavo_cat_id=" . (int)$category_id . "'");
 		if (isset($data['category_seo_url'])) {
 			foreach ($data['category_seo_url'] as $store_id => $language) {
 				foreach ($language as $language_id => $keyword) {

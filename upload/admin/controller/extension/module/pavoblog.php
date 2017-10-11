@@ -14,6 +14,10 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	 * posts list
 	 */
 	public function index() {
+		$this->posts();
+	}
+
+	public function posts() {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/post' );
 
@@ -31,11 +35,32 @@ class ControllerExtensionModulePavoBlog extends Controller {
       		'separator' => ' :: '
    		);
 
-		// posts
-		$this->data['posts'] = $this->model_extension_pavoblog_post->getAll( array(
+		$this->data['add_new_url'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true ) );
 
+		// posts
+		$paged = ! empty( $this->request->get['paged'] ) && is_int( $this->request->get['paged'] ) ? (int)$this->request->get['paged'] : 1;
+		$limited = $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10;
+
+		$this->data['posts'] = $this->model_extension_pavoblog_post->getPosts( array(
+				'start'	=> $paged ? ( $paged - 1 ) * $limited : 0,
+				'limit'	=> $limited
 			) );
 
+		$total = $this->model_extension_pavoblog_post->getTotals();
+		$pagination = new Pagination();
+        $pagination->total = $total;
+        $pagination->page = $paged;
+        $pagination->limit = $limited;
+        $pagination->url = $this->url->link('extension/module/pavoblog/posts', 'user_token=' . $this->session->data['user_token'] . '&paged={page}', true);
+
+        $this->data['pagination'] = $pagination->render();
+        $this->data['results'] = sprintf(
+        	$this->language->get('text_pagination'),
+        	($total) ? ( ($paged - 1) * $limited + 1 ) : 0,
+        	( (($paged - 1) * $limited) > ($total - $limited) ) ? $total : ( ( ($paged - 1) * $limited ) + $limited ),
+        	$total,
+        	ceil( $total / $limited )
+        );
 		// set page document title
 		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'posts_heading_title' ) );
 		$this->data['errors'] = $this->errors;
@@ -121,7 +146,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		if ( ! empty( $this->request->post['post_data'] ) ) {
 			$this->data['post_data'] = $this->request->post['post_data'];
 		} else if ( $post_id ) {
-			$this->data['post_data'] = $this->model_extension_pavoblog_post->getPostData( $post_id );
+			$this->data['post_data'] = $this->model_extension_pavoblog_post->getPostDescription( $post_id );
 		}
 
 		$this->data['post_store'] = array();
@@ -156,6 +181,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 				);
 		}
 
+		$this->data['add_new_url'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true ) );
 		// enqueue scripts, stylesheet needed to display editor
 		$this->document->addScript( 'view/javascript/summernote/summernote.js' );
 		$this->document->addScript( 'view/javascript/summernote/opencart.js' );
@@ -193,17 +219,47 @@ class ControllerExtensionModulePavoBlog extends Controller {
       		'separator' => ' :: '
    		);
 
-		// categories
-   		$this->data['categories'] = $this->model_extension_pavoblog_category->getAll();
+   		if ( $this->erros ) {
+   			$this->data['errors'] = $this->errors;
+   		}
 
-   		if ( $this->data['categories'] ) {
-   			foreach ( $this->data['categories'] as $key => $category ) {
-   				$category['edit'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/category', 'id='.$category['category_id'].'&user_token=' . $this->session->data['user_token'], true ) );
-   				$this->data['categories'][$key] = $category;
-   			}
+   		if ( ! empty( $this->session->data['success'] ) ) {
+   			$this->data['success'] = $this->session->data['success'];
+   			unset( $this->session->data['success'] );
    		}
    		$this->data['action']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'], true ) );
    		$this->data['add_new_url']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true ) );
+
+		// categories
+		$paged = isset( $this->request->get['paged'] ) && is_int( $this->request->get['paged'] ) ? (int)$this->request->get['paged'] : 1;
+		$limited = $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10;
+   		$this->data['categories'] = $this->model_extension_pavoblog_category->getAll( array(
+   			'start'		=> $paged ? ( $paged - 1 ) * $limited : 0,
+   			'limit'		=> $limited
+   		) );
+
+   		$total = $this->model_extension_pavoblog_category->getTotals();
+		$pagination = new Pagination();
+        $pagination->total = $total;
+        $pagination->page = $paged;
+        $pagination->limit = $limited;
+        $pagination->url = $this->url->link('extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'] . '&paged={page}', true);
+
+        $this->data['pagination'] = $pagination->render();
+        $this->data['results'] = sprintf(
+        	$this->language->get('text_pagination'),
+        	($total) ? ( ($paged - 1) * $limited + 1 ) : 0,
+        	( (($paged - 1) * $limited) > ($total - $limited) ) ? $total : ( ( ($paged - 1) * $limited ) + $limited ),
+        	$total,
+        	ceil( $total / $limited )
+        );
+
+   		if ( $this->data['categories'] ) {
+   			foreach ( $this->data['categories'] as $key => $category ) {
+   				$category['edit'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/category', 'category_id='.$category['category_id'].'&user_token=' . $this->session->data['user_token'], true ) );
+   				$this->data['categories'][$key] = $category;
+   			}
+   		}
 
 		// set page document title
 		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'categories_heading_title' ) );
@@ -394,7 +450,48 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	 * pavo blog settings
 	 */
 	public function settings() {
+		$this->load->language( 'extension/module/pavoblog' );
+		$this->load->model( 'setting/setting' );
 
+		if ( $this->request->server['REQUEST_METHOD'] === 'POST' && $this->validateSettingForm() ) {
+			$this->model_setting_setting->editSetting( 'pavoblog', $this->request->post, $this->config->get( 'config_store_id' ) );
+
+			// success message
+			$this->session->data['success'] = $this->language->get( 'text_success' );
+			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/settings', 'user_token=' . $this->session->data['user_token'], true ) ) ); exit();
+		}
+
+		/**
+		 * breadcrumbs data
+		 */
+		$this->data['breadcrumbs'] = array();
+		$this->data['breadcrumbs'][] = array(
+			'text' => $this->language->get( 'text_home' ),
+			'href' => $this->url->link( 'common/dashboard', 'user_token=' . $this->session->data['user_token'], true )
+		);
+		$this->data['breadcrumbs'][] = array(
+			'text' => $this->language->get( 'menu_settings_text' ),
+			'href' => $this->url->link( 'extension/module/pavoblog/settings', '&user_token=' . $this->session->data['user_token'], true )
+		);
+
+		if ( ! empty( $this->session->data['success'] ) ) {
+			$this->data['success'] = $this->session->data['success'];
+			unset( $this->session->data['success'] );
+		}
+
+		$this->data['settings'] = $this->errors ? $this->request->post : $this->model_setting_setting->getSetting( 'pavoblog' );
+		$this->data['save_action']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/settings', 'user_token=' . $this->session->data['user_token'], true ) );
+		$this->data['errors'] = $this->errors ? $this->errors : array();
+
+		$this->document->setTitle( $this->language->get( 'setting_title' ) );
+		$this->data['heading_title'] = $this->language->get( 'setting_title' );
+
+		$this->data = array_merge( array(
+			'header'			=> $this->load->controller( 'common/header' ),
+			'column_left'		=> $this->load->controller( 'common/column_left' ),
+			'footer'			=> $this->load->controller( 'common/footer' ),
+		), $this->data );
+		$this->response->setOutput( $this->load->view( 'extension/module/pavoblog/settings', $this->data ) );
 	}
 
 	/**
@@ -493,6 +590,32 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		return ! $this->errors;
 	}
 
+	private function validateSettingForm() {
+		if ( ! $this->user->hasPermission( 'modify', 'extension/module/pavoblog/settings' )) {
+			$this->errors['warning'] = $this->language->get( 'error_permission' );
+		}
+
+		if ( empty( $this->request->post['pavoblog_post_limit'] ) ) {
+			$this->errors['error_pavoblog_post_limit'] = $this->language->get( 'error_pavoblog_post_limit' );
+		}
+
+		if ( empty( $this->request->post['pavoblog_post_description_length'] ) ) {
+			$this->errors['error_pavoblog_post_description_length'] = $this->language->get( 'error_pavoblog_post_description_length' );
+		}
+
+		if ( empty( $this->request->post['pavoblog_image_thumb_width'] ) ) {
+			$this->errors['error_pavoblog_image_thumb_width'] = $this->language->get( 'error_pavoblog_image_thumb_width' );
+		}
+		if ( empty( $this->request->post['pavoblog_image_thumb_height'] ) ) {
+			$this->errors['error_pavoblog_image_thumb_height'] = $this->language->get( 'error_pavoblog_image_thumb_height' );
+		}
+
+		if ( $this->errors && ! isset( $this->errors['warning'] ) ) {
+			$this->errors['warning'] = $this->language->get( 'error_warning' );
+		}
+		return ! $this->errors;
+	}
+
 	/**
 	 * install actions
 	 * create new permission and tables
@@ -534,6 +657,13 @@ class ControllerExtensionModulePavoBlog extends Controller {
 				CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_post_to_store` (
 					`post_id` int(11) NOT NULL,
 					`store_id` int(11) NOT NULL
+				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+			");
+
+		$this->db->query("
+				CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_post_to_category` (
+					`post_id` int(11) NOT NULL,
+					`category_id` int(11) NOT NULL
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 			");
 
