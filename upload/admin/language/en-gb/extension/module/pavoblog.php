@@ -28,6 +28,13 @@ $_['text_posts']				= 'Posts';
 $_['text_width']				= 'Width';
 $_['text_height']				= 'Height';
 $_['edit_text']					= 'Edit';
+$_['text_grid_columns']			= 'Grid Columns';
+$_['text_default_layout']		= 'Default Layout';
+$_['text_grid']					= 'Grid';
+$_['text_list']					= 'List';
+$_['text_date_time_format']			= 'Date Time Format';
+$_['text_pagination_type']		= 'Pavo Pagination';
+$_['text_pagination_desc']		= 'Use Pavo Pagination or Default Pagination?';
 
 // posts
 $_['title_text']				= 'Title';

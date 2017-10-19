@@ -72,4 +72,18 @@
             ]]></add>
         </operation>
     </file>
+    <file path="catalog/controller/common/header.php">
+        <operation>
+            <search><![CDATA[$data['title'] = $this->document->getTitle();]]></search>
+            <add position="before"><![CDATA[
+        // theme
+        $theme = $this->config->get( 'config_theme' );
+        $file = DIR_TEMPLATE . $theme . '/stylesheet/pavoblog.min.css';
+        if ( file_exists( $file ) ) {
+            $file = str_replace( DIR_APPLICATION, basename( DIR_APPLICATION ) . '/', $file );
+            $this->document->addStyle( $file );
+        }
+        }]]></add>
+        </operation>
+    </file>
 </modification>

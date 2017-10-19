@@ -3,6 +3,7 @@
 $_['heading_title']       	= 'Blog';
 
 // Text
+$_['text_blog']				= 'Blog';
 $_['text_author']        	= 'Author';
 $_['text_published']		= 'Published';
 $_['text_comment']			= 'Comment';
@@ -10,3 +11,8 @@ $_['text_comments']			= 'Comments';
 $_['text_readmore']			= 'Read more...';
 $_['text_tags']				= 'Tags';
 $_['text_categories']		= 'Categories';
+$_['text_posted_by']		= 'Posted by';
+$_['text_readmore']			= 'Read more';
+// pagination
+$_['text_next']					= 'Next';
+$_['text_prev']					= 'Previous';

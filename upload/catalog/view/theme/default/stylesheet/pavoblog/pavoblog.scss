@@ -1,0 +1,105 @@
+@import './sass/variables';
+@import './sass/mixins';
+
+// archives
+.pavoblog-posts{
+	
+	display: flex;
+	display: -webkit-flex;
+	-webkit-flex-wrap: wrap;
+	flex-wrap: wrap;
+
+	* {
+		font-size: $font-size;
+		color: $font-color;
+		font-weight: $font-weight;
+		line-height: $line-height;
+	}
+
+	a{
+		&:hover,
+		&:focus{
+			outline: none;
+			text-decoration: none;
+			color: $link-color-hover;
+		}
+	}
+
+	.post-item{
+		float: left;
+		margin-bottom: 15px;
+
+		&.post-list{
+			.thumb{
+				margin-right: 20px;
+				float: left;
+			}
+		}
+		.caption{
+			margin-bottom: 10px;
+			overflow: hidden;
+
+			.post-title,
+			.post-title a{
+				font-size: $heading-font-size;
+				font-weight: $heading-font-weight;
+				color: $heading-font-color;
+				line-height: $heading-lineheight;
+
+				&:hover{
+					color: $heading-font-color-hover;
+				}
+			}
+			.post-meta{
+				overflow: hidden;
+				*{
+					font-size: $font-size-sm;
+				}
+				> div{
+					float: left;
+					&:first-child{
+						margin-right: 15px;
+					}
+					i{
+						margin-right: 5px;
+					}
+				}
+			}
+			.post-description{
+				clear: both;
+				margin-top: 10px;
+			}
+		}
+
+		.readmore-text{
+			@include button( $font-size, $font-color, $btn-color-hover, $btn-padding, $btn-background, $btn-background-hover, $btn-border, $btn-border-hover );
+		}
+	}
+}
+.pavoblog-pagination{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	li{
+		display: inline-block;
+		a,
+		span{
+			@include button( $font-size, $font-color, $white, $btn-padding, $btn-background, $btn-primary-background-hover, $btn-border, $btn-primary-border-hover );
+			line-height: 1;
+			padding: 8px 15px;
+		}
+
+		&:not(:last-child) {
+			margin-right: 3px;
+		}
+
+		&.active{
+			a,
+			span{
+				background-color: $btn-primary-background-hover;
+				border: $btn-primary-border-hover;
+				color: $white;
+			}
+		}
+	}
+}

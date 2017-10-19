@@ -32,12 +32,66 @@
 			      	</div>
 					<div class="panel-body">
 						<form action="{{ save_action }}" method="post" enctype="multipart/form-data" class="form-horizontal" id="form-settings">
+							<fieldset>
+								<legend>{{ text_general }}</legend>
+						  		<div class="form-group required">
+					              	<label class="col-sm-2 control-label" for="pavoblog_date_format"><span data-toggle="tooltip" title="" data-original-title="{{ text_date_time_format }}">{{ text_date_time_format }}</span></label>
+					              	<div class="col-sm-10">
+					              		<div class="row">
+					              			<div class="col-sm-6">
+							                	<select name="pavoblog_date_format" id="pavoblog_date_format" class="form-control">
+							                		<option value="F j, Y"{{ settings.pavoblog_date_format == 'F j, Y' ? ' selected' : '' }}>{{ 'now'|date( 'F j, Y' ) }}</option>
+							                		<option value="Y-m-d"{{ settings.pavoblog_date_format == 'Y-m-d' ? ' selected' : '' }}>{{ 'now'|date( 'Y-m-d' ) }}</option>
+							                		<option value="m/d/Y"{{ settings.pavoblog_date_format == 'm/d/Y' ? ' selected' : '' }}>{{ 'now'|date( 'm/d/Y' ) }}</option>
+							                		<option value="d/m/Y"{{ settings.pavoblog_date_format == 'd/m/Y' ? ' selected' : '' }}>{{ 'now'|date( 'd/m/Y' ) }}</option>
+							                	</select>
+					              			</div>
+					              			<div class="col-sm-6">
+					              				<select name="pavoblog_time_format" id="pavoblog_time_format" class="form-control">
+							                		<option value="g:i a"{{ settings.pavoblog_time_format == 'g:i a' ? ' selected' : '' }}>{{ 'now'|date( 'g:i a' ) }}</option>
+							                		<option value="g:i A"{{ settings.pavoblog_time_format == 'g:i A' ? ' selected' : '' }}>{{ 'now'|date( 'g:i A' ) }}</option>
+							                		<option value="H:i"{{ settings.pavoblog_time_format == 'H:i' ? ' selected' : '' }}>{{ 'now'|date( 'H:i' ) }}</option>
+							                	</select>
+					              			</div>
+					              		</div>
+	                              	</div>
+					            </div>
+					            {% if pavo_pagination %}
+							  		<div class="form-group required">
+						              	<label class="col-sm-2 control-label" for="pavoblog_pagination"><span data-toggle="tooltip" title="" data-original-title="{{ text_pagination_desc }}">{{ text_pagination_type }}</span></label>
+						              	<div class="col-sm-10">
+						                	<select name="pavoblog_pagination" id="pavoblog_pagination" class="form-control">
+						                		<option value="1"{{ settings.pavoblog_pagination == 1 ? ' selected' : '' }}>{{ entry_yes_text }}</option>
+						                		<option value="0"{{ settings.pavoblog_pagination == 0 ? ' selected' : '' }}>{{ entry_no_text }}</option>
+						                	</select>
+		                              	</div>
+						            </div>
+						        {% endif %}
+							</fieldset>
 						  	<fieldset>
 						  		<legend>{{ text_posts }}</legend>
 						  		<div class="form-group required">
+					              	<label class="col-sm-2 control-label" for="pavoblog_default_layout"><span data-toggle="tooltip" title="" data-original-title="{{ text_default_layout }}">{{ text_default_layout }}</span></label>
+					              	<div class="col-sm-10">
+					                	<select name="pavoblog_default_layout" id="pavoblog_default_layout" class="form-control">
+					                		<option value="grid"{{ settings.pavoblog_default_layout == 'grid' ? ' selected' : '' }}>{{ text_grid }}</option>
+					                		<option value="list"{{ settings.pavoblog_default_layout == 'list' ? ' selected' : '' }}>{{ text_list }}</option>
+					                	</select>
+	                              	</div>
+					            </div>
+						  		<div class="form-group required">
+					              	<label class="col-sm-2 control-label" for="input-grid-columns"><span data-toggle="tooltip" title="" data-original-title="{{ text_grid_columns }}">{{ text_grid_columns }}</span></label>
+					              	<div class="col-sm-10">
+					                	<input type="number" step="1" min="1" name="pavoblog_grid_columns" value="{{ settings.pavoblog_grid_columns is defined ? settings.pavoblog_grid_columns : 10 }}" placeholder="{{ text_grid_columns }}" id="input-grid-columns" class="form-control" />
+					                	{% if errors.error_pavoblog_grid_columns %}
+											<div class="text-danger">{{ errors.error_pavoblog_grid_columns }}</div>
+										{% endif %}
+	                              	</div>
+					            </div>
+						  		<div class="form-group required">
 					              	<label class="col-sm-2 control-label" for="input-catalog-limit"><span data-toggle="tooltip" title="" data-original-title="{{ entry_default_items_title }}">{{ entry_default_items }}</span></label>
 					              	<div class="col-sm-10">
-					                	<input type="number" step="1" min="1" name="pavoblog_post_limit" value="{{ settings.pavoblog_post_limit is defined ? settings.pavoblog_post_limit : 10 }}" placeholder="{{ entry_default_items_plc }}" id="input-catalog-limit" class="form-control">
+					                	<input type="number" step="1" min="1" name="pavoblog_post_limit" value="{{ settings.pavoblog_post_limit is defined ? settings.pavoblog_post_limit : 10 }}" placeholder="{{ entry_default_items_plc }}" id="input-catalog-limit" class="form-control" />
 					                	{% if errors.error_pavoblog_post_limit %}
 											<div class="text-danger">{{ errors.error_pavoblog_post_limit }}</div>
 										{% endif %}
@@ -46,7 +100,7 @@
 					            <div class="form-group required">
 					              	<label class="col-sm-2 control-label" for="input-description-limit"><span data-toggle="tooltip" title="" data-original-title="{{ entry_limit_desc_title }}">{{ entry_desc_limit }}</span></label>
 					              	<div class="col-sm-10">
-						                <input type="number" step="1" min="1" name="pavoblog_post_description_length" value="{{ settings.pavoblog_post_description_length is defined ? settings.pavoblog_post_description_length : 100 }}" placeholder="{{ entry_desc_limit_plc }}" id="input-description-limit" class="form-control">
+						                <input type="number" step="1" min="1" name="pavoblog_post_description_length" value="{{ settings.pavoblog_post_description_length is defined ? settings.pavoblog_post_description_length : 100 }}" placeholder="{{ entry_desc_limit_plc }}" id="input-description-limit" class="form-control" />
 						                {% if errors.error_pavoblog_post_description_length %}
 											<div class="text-danger">{{ errors.error_pavoblog_post_description_length }}</div>
 										{% endif %}
@@ -60,13 +114,13 @@
 					              	<div class="col-sm-10">
 						                <div class="row">
 						                  	<div class="col-sm-6">
-						                    	<input type="number" step="1" min="1" name="pavoblog_image_thumb_width" value="{{ settings.pavoblog_image_thumb_width is defined ? settings.pavoblog_image_thumb_width : 228 }}" placeholder="{{ text_width }}" id="input-image-thumb-width" class="form-control">
+						                    	<input type="number" step="1" min="1" name="pavoblog_image_thumb_width" value="{{ settings.pavoblog_image_thumb_width is defined ? settings.pavoblog_image_thumb_width : 228 }}" placeholder="{{ text_width }}" id="input-image-thumb-width" class="form-control" />
 							                  	{% if errors.error_pavoblog_image_thumb_width %}
 													<div class="text-danger">{{ errors.error_pavoblog_image_thumb_width }}</div>
 												{% endif %}
 						                  	</div>
 						                  	<div class="col-sm-6">
-						                    	<input type="number" step="1" min="1" name="pavoblog_image_thumb_height" value="{{ settings.pavoblog_image_thumb_height is defined ? settings.pavoblog_image_thumb_height : 228 }}" placeholder="{{ text_height }}" class="form-control">
+						                    	<input type="number" step="1" min="1" name="pavoblog_image_thumb_height" value="{{ settings.pavoblog_image_thumb_height is defined ? settings.pavoblog_image_thumb_height : 228 }}" placeholder="{{ text_height }}" class="form-control" />
 							                  	{% if errors.error_pavoblog_image_thumb_height %}
 													<div class="text-danger">{{ errors.error_pavoblog_image_thumb_height }}</div>
 												{% endif %}

@@ -38,7 +38,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->data['add_new_url'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true ) );
 
 		// posts
-		$paged = ! empty( $this->request->get['paged'] ) && is_int( $this->request->get['paged'] ) ? (int)$this->request->get['paged'] : 1;
+		$paged = ! empty( $this->request->get['page'] ) ? (int)$this->request->get['page'] : 1;
 		$limited = $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10;
 
 		$this->data['posts'] = $this->model_extension_pavoblog_post->getPosts( array(
@@ -142,6 +142,15 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			$this->data['post']['user_id'] = $this->session->data['user_id'];
 		}
 
+		// status
+		if ( ! isset( $this->data['post']['status'] ) ) {
+			$this->data['post']['status'] = 1;
+		}
+		// featured
+		if ( ! isset( $this->data['post']['featured'] ) ) {
+			$this->data['post']['featured'] = 1;
+		}
+
 		$this->data['post_data'] = array();
 		if ( ! empty( $this->request->post['post_data'] ) ) {
 			$this->data['post_data'] = $this->request->post['post_data'];
@@ -231,7 +240,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
    		$this->data['add_new_url']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true ) );
 
 		// categories
-		$paged = isset( $this->request->get['paged'] ) && is_int( $this->request->get['paged'] ) ? (int)$this->request->get['paged'] : 1;
+		$paged = isset( $this->request->get['page'] ) && is_int( $this->request->get['page'] ) ? (int)$this->request->get['page'] : 1;
 		$limited = $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10;
    		$this->data['categories'] = $this->model_extension_pavoblog_category->getAll( array(
    			'start'		=> $paged ? ( $paged - 1 ) * $limited : 0,
@@ -480,6 +489,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		}
 
 		$this->data['settings'] = $this->errors ? $this->request->post : $this->model_setting_setting->getSetting( 'pavoblog' );
+		$this->data['pavo_pagination'] = class_exists( 'Pavo_Pagination' );
 		$this->data['save_action']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/settings', 'user_token=' . $this->session->data['user_token'], true ) );
 		$this->data['errors'] = $this->errors ? $this->errors : array();
 
@@ -761,5 +771,23 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->model_user_user_group->removePermission( $this->user->getId(), 'access', 'extension/module/pavoblog/comments' );
 		$this->model_user_user_group->removePermission( $this->user->getId(), 'modify', 'extension/module/pavoblog/comment' );
 		// END REMOVE USER PERMISSION
+
+		// DEFAULT OPTIONS
+
+		$this->load->model( 'setting/setting' );
+		// options insert before
+		$settings = $this->model_setting_setting->getSetting( 'pavoblog' );
+		$settings = array_merge( array(
+			'pavoblog_date_format'				=> 'F j, Y',
+			'pavoblog_time_format'				=> 'g:i a',
+			'pavoblog_pagination'				=> 1,
+			'pavoblog_default_layout'			=> 'grid',
+			'pavoblog_grid_columns'				=> 3,
+			'pavoblog_post_limit'				=> 10,
+			'pavoblog_post_description_length'	=> 200,
+			'pavoblog_image_thumb_width'		=> 370,
+			'pavoblog_image_thumb_height'		=> 210
+		), $settings );
+		$this->model_setting_setting->editSetting( 'pavoblog', $settings, $this->config->get( 'config_store_id' ) );
 	}
 }

@@ -9,6 +9,7 @@ class ModelExtensionPavoBlogPost extends Model {
 			'category_id'	=> '',
 			'tags'			=> '',
 			'user_id'		=> '',
+			'username'		=> '',
 			'featured' 		=> '',
 			'orderby'		=> 'post_id',
 			'order'			=> 'DESC',
@@ -19,7 +20,7 @@ class ModelExtensionPavoBlogPost extends Model {
 		), $data );
 		extract( $data );
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS DISTINCT * FROM " . DB_PREFIX . "pavoblog_post AS post";
+		$sql = "SELECT SQL_CALC_FOUND_ROWS DISTINCT post.*, pdesc.*, user.username FROM " . DB_PREFIX . "pavoblog_post AS post";
 		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_post_to_store AS postst ON postst.post_id = post.post_id AND postst.store_id = " . (int)$store_id;
 		if ( $category_id ) {
 			$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_category AS cat ON ( cat.category_id = " . $this->db->escape( $category_id ) . " OR cat.parent_id = ".(int)$category_id." )";
@@ -27,10 +28,15 @@ class ModelExtensionPavoBlogPost extends Model {
 		}
 
 		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_post_description AS pdesc ON pdesc.post_id = post.post_id AND pdesc.language_id = " . $this->db->escape( $language_id );
+		$sql .= " LEFT JOIN " . DB_PREFIX . "user as user ON user.user_id = post.user_id";
 
 		$where = ' WHERE 1=1';
-		if ( $user_id )
+		if ( $user_id ) {
 			$where .= " AND post.user_id = " . (int)$user_id;
+		}
+		if ( $username ){
+			$sql .= " user.username = '".$this->db->escape($username)."'";
+		}
 
 		if ( $featured )
 			$where .= " AND post.feauterd = " . (int)$featured;
@@ -53,7 +59,7 @@ class ModelExtensionPavoBlogPost extends Model {
 		}
 
 		if ( $date_added ) {
-			$where .= " AND post.date_added >= " . $this->db->escape( $date_added );
+			$where .= " AND post.date_added <= '" . $this->db->escape( $date_added ) . "'";
 		}
 
 		if ( $status ) {
@@ -79,6 +85,14 @@ class ModelExtensionPavoBlogPost extends Model {
 		$query = $this->db->query( $sql );
 		return $query->rows;
  	}
+
+	public function getTotals() {
+		$query = $this->db->query( 'SELECT FOUND_ROWS()' );
+		if ( $query->row && isset( $query->row['FOUND_ROWS()'] ) ) {
+			return (int)$query->row['FOUND_ROWS()'];
+		}
+		return 0;
+	}
 
  	/**
  	 * get post
