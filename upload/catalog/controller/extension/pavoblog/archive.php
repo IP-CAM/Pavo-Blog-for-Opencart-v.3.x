@@ -1,6 +1,6 @@
 <?php
 
-class ControllerExtensionPavoBlogPosts extends Controller {
+class ControllerExtensionPavoBlogArchive extends Controller {
 
 	public function index() {
 		/**
@@ -21,7 +21,7 @@ class ControllerExtensionPavoBlogPosts extends Controller {
 		);
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_blog'),
-			'href' => $this->url->link('extension/pavoblog/posts')
+			'href' => $this->url->link('extension/pavoblog/archive')
 		);
 		if ( isset( $this->request->get['path'] ) ) {
 			$path = '';
@@ -42,7 +42,7 @@ class ControllerExtensionPavoBlogPosts extends Controller {
 				if ($category_info) {
 					$data['breadcrumbs'][] = array(
 						'text' => $category_info['name'],
-						'href' => $this->url->link('extension/pavoblog/posts', 'path=' . $path)
+						'href' => $this->url->link('extension/pavoblog/archive', 'path=' . $path)
 					);
 				}
 			}
@@ -72,7 +72,7 @@ class ControllerExtensionPavoBlogPosts extends Controller {
 
 				$data['breadcrumbs'][] = array(
 					'text' => $category_info['name'],
-					'href' => $this->url->link('extension/pavoblog/posts', 'path=' . $this->request->get['path'] . $url)
+					'href' => $this->url->link('extension/pavoblog/archive', 'path=' . $this->request->get['path'] . $url)
 				);
 			}
 		}
@@ -121,14 +121,14 @@ class ControllerExtensionPavoBlogPosts extends Controller {
 			$index = @strpos( $description, ' ', (int)$this->config->get( 'pavoblog_post_description_length' ) );
 			$subdescription = substr( $description, 0, $index === false ? 0 : $index );
 			$post['description'] = $subdescription ? $subdescription : $description;
-			$post['href'] = $this->url->link( 'pavoblog/post', 'post_id=' . $post['post_id'] );
+			$post['href'] = $this->url->link( 'extension/pavoblog/post', 'post_id=' . $post['post_id'] );
 			$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'pavoblog/post', 'username=' . $post['username'] ) : '';
 
 			$data['posts'][] = $post;
 		}
 
 		ob_start();
-		echo $this->load->view( 'pavoblog/post' . $layout, $data );
+		echo $this->load->view( 'pavoblog/' . $layout, $data );
 		$data['pavoblog_posts'] = ob_get_clean();
 
 		// pagination
@@ -140,7 +140,7 @@ class ControllerExtensionPavoBlogPosts extends Controller {
         $pagination->limit = $args['limit'];
         $pagination->text_next = $this->language->get( 'text_next' );
         $pagination->text_prev = $this->language->get( 'text_prev' );
-        $pagination->url = $this->url->link('extension/pavoblog/posts', 'user_token=' . $this->session->data['user_token'] . '&page={page}', true);
+        $pagination->url = $this->url->link('extension/pavoblog/archive', 'user_token=' . $this->session->data['user_token'] . '&page={page}', true);
 
         $data['pagination'] = $pagination->render();
         $data['results'] = sprintf(
