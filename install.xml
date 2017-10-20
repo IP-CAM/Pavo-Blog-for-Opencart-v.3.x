@@ -20,7 +20,7 @@
                     $settings[] = array(
                         'name'     => $this->language->get('menu_posts_text'),
                         'href'     => $this->url->link('extension/module/pavoblog/index', 'user_token=' . $this->session->data['user_token'], true),
-                        'children' => array()   
+                        'children' => array()
                     );
                 }
 
@@ -29,7 +29,7 @@
                     $settings[] = array(
                         'name'     => $this->language->get('menu_post_add_new_text'),
                         'href'     => $this->url->link('extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true),
-                        'children' => array()   
+                        'children' => array()
                     );
                 }
 
@@ -38,7 +38,7 @@
                     $settings[] = array(
                         'name'     => $this->language->get('menu_categories_text'),
                         'href'     => $this->url->link('extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'], true),
-                        'children' => array()   
+                        'children' => array()
                     );
                 }
 
@@ -47,7 +47,7 @@
                     $settings[] = array(
                         'name'     => $this->language->get('menu_comments_text'),
                         'href'     => $this->url->link('extension/module/pavoblog/comments', 'user_token=' . $this->session->data['user_token'], true),
-                        'children' => array()   
+                        'children' => array()
                     );
                 }
                 // view settings panel
@@ -55,7 +55,7 @@
                     $settings[] = array(
                         'name'     => $this->language->get('menu_settings_text'),
                         'href'     => $this->url->link('extension/module/pavoblog/settings', 'user_token=' . $this->session->data['user_token'], true),
-                        'children' => array()   
+                        'children' => array()
                     );
                 }
 
@@ -76,14 +76,71 @@
         <operation>
             <search><![CDATA[$data['title'] = $this->document->getTitle();]]></search>
             <add position="before"><![CDATA[
-        // theme
-        $theme = $this->config->get( 'config_theme' );
-        $file = DIR_TEMPLATE . $theme . '/stylesheet/pavoblog.min.css';
-        if ( file_exists( $file ) ) {
-            $file = str_replace( DIR_APPLICATION, basename( DIR_APPLICATION ) . '/', $file );
-            $this->document->addStyle( $file );
-        }
+        if ( $this->config->get( 'pavoblog_default_style' ) ){
+            $file = DIR_TEMPLATE . 'default/stylesheet/pavoblog.min.css';
+            if ( file_exists( $file ) ) {
+                $file = str_replace( DIR_APPLICATION, basename( DIR_APPLICATION ) . '/', $file );
+                $this->document->addStyle( $file );
+            }
         }]]></add>
         </operation>
     </file>
+    <file path="system/engine/loader.php">
+        <operation>
+            <search>
+                <![CDATA[$template = new Template($this->registry->get('config')->get('template_engine'));]]>
+            </search>
+            <add position="replace">
+                <![CDATA[$template = new Template($this->registry->get('config')->get('template_engine'), $this->registry->get('config')->get('config_theme'));]]>
+            </add>
+        </operation>
+    </file>
+    <file path="system/library/template.php">
+        <operation>
+            <search>
+                <![CDATA[public function __construct($adaptor) {]]>
+            </search>
+            <add position="replace">
+                <![CDATA[public function __construct($adaptor, $theme = 'default' ){
+                    $this->theme = $theme;
+                ]]>
+            </add>
+        </operation>
+        <operation>
+            <search>
+                <![CDATA[$this->adaptor = new $class();]]>
+            </search>
+            <add position="replace">
+                <![CDATA[$this->adaptor = new $class( $this->theme );]]>
+            </add>
+        </operation>
+    </file>
+    <file path="system/library/template/twig.php">
+        <operation>
+            <search>
+                <![CDATA[public function __construct() {]]>
+            </search>
+            <add position="replace"><![CDATA[public function __construct( $theme = 'default' ) {
+                    $this->theme = $theme;
+                ]]></add>
+        </operation>
+        <operation>
+            <search>
+                <![CDATA[$config = array('autoescape' => false);]]>
+            </search>
+            <add position="before">
+            <![CDATA[
+                $dirs = array(
+                    DIR_TEMPLATE . $this->theme . '/',
+                    DIR_TEMPLATE . 'default/'
+                );
+                foreach ( $dirs as $dir ) {
+                    if ( is_dir( $dir ) ) {
+                        $loader->addPath( $dir );
+                    }
+                }
+                ]]>
+            </add>
+        </operation>
+  </file>
 </modification>

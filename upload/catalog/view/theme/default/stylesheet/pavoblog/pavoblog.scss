@@ -1,6 +1,10 @@
 @import './sass/variables';
 @import './sass/mixins';
 
+.pavo-btn-info {
+    @include button( $font-size, $font-color, $white, $btn-padding, $btn-background, $btn-primary-background-hover, $btn-border, $btn-primary-border-hover );
+}
+
 // archives
 .pavoblog-posts{
 	
@@ -72,7 +76,7 @@
 		}
 
 		.readmore-text{
-			@include button( $font-size, $font-color, $btn-color-hover, $btn-padding, $btn-background, $btn-background-hover, $btn-border, $btn-border-hover );
+			@include button( $font-size, $font-color, $white, $btn-padding, $btn-background, $btn-primary-background-hover, $btn-border, $btn-primary-border-hover );
 		}
 	}
 }

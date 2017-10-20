@@ -13,6 +13,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 
 		$args = $data = array();
 
+		$data['theme'] = $this->config->get( 'config_theme' );
 		$data['breadcrumbs'] = array();
 
 		$data['breadcrumbs'][] = array(
@@ -99,7 +100,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 		$total = $this->model_extension_pavoblog_post->getTotals();
 		// grid columns
 		$data['columns'] = $this->config->get( 'pavoblog_grid_columns' ) ? $this->config->get( 'pavoblog_grid_columns' ) : 3;
-		$layout = $this->config->get( 'pavoblog_default_layout' ) ? $this->config->get( 'pavoblog_default_layout' ) : 'grid';
+		$data['layout'] = $layout = $this->config->get( 'pavoblog_default_layout' ) ? $this->config->get( 'pavoblog_default_layout' ) : 'grid';
 		$data['date_format'] = $this->config->get( 'pavoblog_date_format' ) ? $this->config->get( 'pavoblog_date_format' ) : 'Y-m-d';
 		$data['time_format'] = $this->config->get( 'pavoblog_time_format' ) ? $this->config->get( 'pavoblog_time_format' ) : 'Y-m-d';
 		$data['posts'] = array();
@@ -126,10 +127,6 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 
 			$data['posts'][] = $post;
 		}
-
-		ob_start();
-		echo $this->load->view( 'pavoblog/' . $layout, $data );
-		$data['pavoblog_posts'] = ob_get_clean();
 
 		// pagination
 		$pavo_pagination = $this->config->get( 'pavoblog_pagination' ) && class_exists( 'Pavo_Pagination' );
@@ -166,7 +163,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 		/**
 		 * set layout template
 		 */
-		$this->response->setOutput( $this->load->view( 'pavoblog/posts', $data ) );
+		$this->response->setOutput( $this->load->view( 'pavoblog/archive', $data ) );
 	}
 
 	/**

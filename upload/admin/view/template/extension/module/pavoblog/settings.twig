@@ -56,6 +56,15 @@
 					              		</div>
 	                              	</div>
 					            </div>
+					            <div class="form-group required">
+					              	<label class="col-sm-2 control-label" for="pavoblog_default_style"><span data-toggle="tooltip" title="" data-original-title="{{ text_default_style }}">{{ text_default_style }}</span></label>
+					              	<div class="col-sm-10">
+					                	<select name="pavoblog_default_style" id="pavoblog_default_style" class="form-control">
+					                		<option value="1"{{ settings.pavoblog_default_style == 1 ? ' selected' : '' }}>{{ entry_yes_text }}</option>
+					                		<option value="0"{{ settings.pavoblog_default_style == 0 ? ' selected' : '' }}>{{ entry_no_text }}</option>
+					                	</select>
+	                              	</div>
+					            </div>
 					            {% if pavo_pagination %}
 							  		<div class="form-group required">
 						              	<label class="col-sm-2 control-label" for="pavoblog_pagination"><span data-toggle="tooltip" title="" data-original-title="{{ text_pagination_desc }}">{{ text_pagination_type }}</span></label>

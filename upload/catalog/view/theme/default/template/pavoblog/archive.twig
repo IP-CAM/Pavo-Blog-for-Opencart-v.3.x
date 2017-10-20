@@ -21,7 +21,11 @@
 
           {% if posts %}
             {# main container #}
-            {{ pavoblog_posts }}
+            <div class="row pavoblog-posts">
+              {% for post in posts %}
+                {% include ( '/pavoblog/content-' ~ layout ~ '.twig' ) %}
+              {% endfor %}
+            </div>
             <div class="row">
               <div class="col-sm-6 text-left">{{ pagination }}</div>
               <div class="col-sm-6 text-right">{{ results }}</div>
