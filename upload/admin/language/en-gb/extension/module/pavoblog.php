@@ -80,7 +80,7 @@ $_['entry_meta_title']			= 'Meta Tag Title';
 $_['entry_meta_description']	= 'Meta Description';
 $_['entry_meta_keyword']		= 'Meta Keywords';
 $_['entry_post_tag']			= 'Post Tags';
-$_['entry_post_tag_description']	= 'Comma separated';
+$_['entry_post_tag_description']= 'Comma separated';
 $_['entry_yes_text'] 			= 'Yes';
 $_['entry_no_text'] 			= 'No';
 $_['entry_add_post_text'] 		= 'Add Post';
@@ -95,6 +95,7 @@ $_['entry_desc_limit']			= 'List Description Limit';
 $_['entry_limit_desc_title']	= 'In the list view, short description character limit (categories, posts etc)';
 $_['entry_desc_limit_plc']		= 'List Description Limit';
 $_['entry_post_image_thumb']	= 'Post Image Thumb Size (W x H)';
+$_['entry_single_post_image']	= 'Post Image Single (W x H)';
 
 //
 $_['entry_text_keyword'] 		= 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';
@@ -102,6 +103,8 @@ $_['entry_store'] 				= 'Stores';
 $_['entry_keyword'] 			= 'Keyword';
 $_['entry_email_text'] 			= 'Email';
 $_['text_confirm'] 				= 'Are you sure?';
+$_['text_full']					= 'Full';
+$_['text_custom']				= 'Custom';
 
 // buttons
 $_['save_button'] 				= 'Save';

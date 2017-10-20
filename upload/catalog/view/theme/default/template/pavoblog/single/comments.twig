@@ -1,0 +1,12 @@
+{% if ( post.comments ) %}
+	{% set comments = post.comments %}
+	<div class="comment-list">
+		<ol>
+			{% for comment in comments %}
+				{% include 'pavoblog/comment/loop-comment.twig' with { 'comment' : comment } %}
+			{% endfor %}
+		</ol>
+	</div>
+{% endif %}
+
+{% include '/pavoblog/comment/comment-form.twig' with { 'user' : user } %}

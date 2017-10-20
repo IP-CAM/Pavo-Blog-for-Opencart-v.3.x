@@ -17,4 +17,8 @@
         border: $border-hover;
         text-decoration: none;
     }
+
+    &:focus{
+        outline: none;
+    }
 }

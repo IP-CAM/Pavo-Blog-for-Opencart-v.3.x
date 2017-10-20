@@ -1,0 +1,34 @@
+<div class="entry-post-image">
+
+	<header>
+		<div class="entry-media">
+			{% include ( 'pavoblog/single/image.twig' ) %}
+		</div>
+		<div class="entry-heading">
+			{# post title #}
+			{% include ( 'pavoblog/single/title.twig' ) %}
+
+			<div class="entry-meta">
+				{# posted by #}
+				{% include ( 'pavoblog/loop/author.twig' ) %}
+
+				{# post date #}
+				{% include ( 'pavoblog/loop/date.twig' ) %}
+
+				{# post date #}
+				{% include ( 'pavoblog/loop/comment-count.twig' ) %}
+			</div>
+		</div>
+	</header>
+
+	<section class="entry-content">
+		{# content #}
+		{% include ( 'pavoblog/single/content.twig' ) %}
+	</section>
+
+	<section class="comments">
+		{# comments #}
+		{% include ( 'pavoblog/single/comments.twig' ) %}
+	</section>
+
+</div>

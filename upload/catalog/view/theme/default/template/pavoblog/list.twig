@@ -6,8 +6,8 @@
 	  				<a href="{{ post.href }}"><img src="{{ post.thumb }}" alt="{{ post.name }}" title="{{ post.name }}" class="img-responsive" /></a>
 	  			</div>
 	  			<div class="caption">
-	  				<h4 class="post-title"><a href="{{ post.href }}">{{ post.name }}</a></h4>
-	  				<div class="post-meta">
+	  				<h4 class="entry-title"><a href="{{ post.href }}">{{ post.name }}</a></h4>
+	  				<div class="entry-meta">
 	  					<div class="post-author">
 	  						<i class="fa fa-user-o" aria-hidden="true"></i>
 	  						{{ text_posted_by }}
@@ -18,7 +18,7 @@
 	  						{{ post.date_added | date( [ date_format, ' ', time_format ] | join() ) }}
 	  					</div>
 	  				</div>
-	  				<div class="post-description">
+	  				<div class="entry-description">
 	  					<p>{{ post.description }}</p>
 	  				</div>
 		  			<div class="readmore">

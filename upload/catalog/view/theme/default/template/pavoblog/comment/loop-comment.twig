@@ -1,0 +1,38 @@
+{% if comment %}
+	<li class="comment">
+		<div class="avatar">
+			<img src="{{ comment.thumb }}" />
+		</div>
+		<div class="comment-content">
+			<div class="name">
+				{% if comment.user_id %}
+					<a href="{{ comment.user_href }}">{{ comment.username }}</a>
+				{% else %}
+					{{ comment.username }}
+				{% endif %}
+			</div>
+			{% if comment.comment_title %}
+				<div class="comment-title">
+					<h4>{{ comment.title }}</h4>
+				</div>
+			{% endif %}
+			{% if comment.content %}
+				<div class="comment-content">
+					{{ comment.content }}
+				</div>
+				{% if reply %}
+					<i class="fa fa-reply"></i>
+					{% if comment.comments %}
+						<div class="comment-list">
+							<ol>
+								{% for sub in comment.comments %}
+									{% include 'pavoblog/comment/loop-comment.twig' with { 'comment' : sub } %}
+								{% endfor %}
+							</ol>
+						</div>
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		</div>
+	</li>
+{% endif %}

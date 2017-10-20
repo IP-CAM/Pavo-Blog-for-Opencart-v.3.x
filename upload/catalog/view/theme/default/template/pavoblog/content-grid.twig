@@ -1,16 +1,16 @@
 {% if post %}
   {% set cols = (12 / columns) | round( 0, 'ceil' ) %}
-  <div class="post-item post-grid post-id-{{ post.post_id }} col-lg-{{ cols }} col-md-{{ cols }} col-sm-{{ cols }} col-xs-{{ cols }}" data-column="{{ columns }}">
+  <div class="article post-item post-grid post-id-{{ post.post_id }} col-lg-{{ cols }} col-md-{{ cols }} col-sm-{{ cols }} col-xs-{{ cols }}" data-column="{{ columns }}">
 
     {# thumbnail #}
     {% include '/pavoblog/loop/thumbnail.twig' %}
 
-    <div class="caption">
+    <div class="entry-content">
       {# title #}
       {% include '/pavoblog/loop/title.twig' %}
       {# endtitle #}
 
-      <div class="post-meta">
+      <div class="entry-meta">
         {# author #}
         {% include '/pavoblog/loop/author.twig' %}
         {# date #}

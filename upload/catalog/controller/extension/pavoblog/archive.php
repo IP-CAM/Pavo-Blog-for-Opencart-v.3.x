@@ -123,7 +123,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 			$subdescription = substr( $description, 0, $index === false ? 0 : $index );
 			$post['description'] = $subdescription ? $subdescription : $description;
 			$post['href'] = $this->url->link( 'extension/pavoblog/post', 'post_id=' . $post['post_id'] );
-			$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'pavoblog/post', 'username=' . $post['username'] ) : '';
+			$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'pavoblog/archive', 'username=' . $post['username'] ) : '';
 
 			$data['posts'][] = $post;
 		}

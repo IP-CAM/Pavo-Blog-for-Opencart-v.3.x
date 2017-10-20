@@ -102,9 +102,10 @@ class ModelExtensionPavoBlogPost extends Model {
  	public function getPost( $post_id = null ) {
  		$language_id = $this->config->get( 'config_language_id' );
  		$store_id = $this->config->get( 'config_store_id' );
- 		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_post AS post";
+ 		$sql = "SELECT post.*, user.username, user.user_id, pdesc.* FROM " . DB_PREFIX . "pavoblog_post AS post";
  		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_post_description AS pdesc ON pdesc.post_id = post.post_id AND pdesc.language_id = " . (int)$language_id;
  		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_post_to_store AS pstore ON pstore.post_id = post.post_id AND pstore.store_id = " . (int)$store_id;
+ 		$sql .= " LEFT JOIN " . DB_PREFIX . "user as user ON user.user_id = post.user_id";
  		$sql .= " WHERE post.post_id = " . (int)$post_id;
 
  		$query = $this->db->query( $sql );

@@ -1,0 +1,29 @@
+<form action="{{ comment_action }}" id="comment-form" class="comment-form">
+	<div class="row">
+		<div class="col-md-12 col-xs-12">
+			<textarea class="pavo-form-control" id="comment-text" placeholder="{{ text_comment }}"></textarea>
+		</div>
+	</div>
+	{% if ( logged_in == false ) %}
+		<div class="row">
+			<div class="col-md-6 col-xs-12">
+				<input type="text" name="name" class="comment-name pavo-form-control" placeholder="{{ text_display_name }}" />
+			</div>
+			<div class="col-md-6 col-xs-12">
+				<input type="email" name="email" class="comment-name pavo-form-control" placeholder="{{ text_display_name }}" />
+			</div>
+		</div>
+	{% endif %}
+	<div class="row">
+		<div class="col-sm-12 col-xs-12 pull-left">
+			<input type="hidden" name="post_id" value="{{ post.post_id }}" />
+			<p><button type="submit" id="comment-form-submit" class="pavo-btn-info">{{ text_submit_comment }}</button></p>
+			<p>
+				<input type="checkbox" name="subscribe-comment" /> {{ text_notify_follow_comment }}
+			</p>
+			<p>
+				<input type="checkbox" name="subscribe-post" /> {{ text_notify_new_post }}
+			</p>
+		</div>
+	</div>
+</form>

@@ -6,7 +6,7 @@
       {% endfor %}
     </ul>
     {% if success %}
-    <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
+      <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}</div>
     {% endif %}
     <div class="row">{{ column_left }}
       {% if column_left and column_right %}
@@ -19,7 +19,11 @@
       <div id="content" class="{{ class }}">
         {{ content_top }}
 
-          
+          <div class="row pavoblog-post single">
+            <div class="article content-single-{{ post.post_type }}">
+              {% include ( '/pavoblog/content-single-' ~ post.post_type ~ '.twig' ) %}
+            </div>
+          </div>
 
         {{ content_bottom }}
       </div>
