@@ -48,6 +48,7 @@
 					              			</div>
 					              			<div class="col-sm-6">
 					              				<select name="pavoblog_time_format" id="pavoblog_time_format" class="form-control">
+					              					<option value="">{{ text_none }}</option>
 							                		<option value="g:i a"{{ settings.pavoblog_time_format == 'g:i a' ? ' selected' : '' }}>{{ 'now'|date( 'g:i a' ) }}</option>
 							                		<option value="g:i A"{{ settings.pavoblog_time_format == 'g:i A' ? ' selected' : '' }}>{{ 'now'|date( 'g:i A' ) }}</option>
 							                		<option value="H:i"{{ settings.pavoblog_time_format == 'H:i' ? ' selected' : '' }}>{{ 'now'|date( 'H:i' ) }}</option>
@@ -76,6 +77,15 @@
 		                              	</div>
 						            </div>
 						        {% endif %}
+						        <div class="form-group required">
+						              	<label class="col-sm-2 control-label" for="pavoblog_reply"><span data-toggle="tooltip" title="" data-original-title="{{ text_reply }}">{{ text_reply }}</span></label>
+						              	<div class="col-sm-10">
+						                	<select name="pavoblog_reply" id="pavoblog_reply" class="form-control">
+						                		<option value="1"{{ settings.pavoblog_reply == 1 ? ' selected' : '' }}>{{ entry_yes_text }}</option>
+						                		<option value="0"{{ settings.pavoblog_reply == 0 ? ' selected' : '' }}>{{ entry_no_text }}</option>
+						                	</select>
+		                              	</div>
+						            </div>
 							</fieldset>
 						  	<fieldset>
 						  		<legend>{{ text_posts }}</legend>
@@ -159,6 +169,25 @@
 						                    	<input type="number" step="1" min="1" name="pavoblog_single_image_height" value="{{ settings.pavoblog_single_image_height is defined ? settings.pavoblog_single_image_height : 228 }}" placeholder="{{ text_height }}" class="form-control" />
 							                  	{% if errors.error_pavoblog_single_image_height %}
 													<div class="text-danger">{{ errors.error_pavoblog_single_image_height }}</div>
+												{% endif %}
+						                  	</div>
+						                </div>
+	                              	</div>
+					            </div>
+						  		<div class="form-group required">
+					              	<label class="col-sm-2 control-label" for="input-avatar-width">{{ entry_avatar_image }}</label>
+					              	<div class="col-sm-10">
+						                <div class="row">
+						                  	<div class="col-sm-6">
+						                    	<input type="number" step="1" min="1" name="pavoblog_avatar_width" value="{{ settings.pavoblog_avatar_width is defined ? settings.pavoblog_avatar_width : 54 }}" placeholder="{{ text_width }}" id="input-avatar-width" class="form-control" />
+							                  	{% if errors.error_pavoblog_avatar_width %}
+													<div class="text-danger">{{ errors.error_pavoblog_avatar_width }}</div>
+												{% endif %}
+						                  	</div>
+						                  	<div class="col-sm-6">
+						                    	<input type="number" step="1" min="1" name="pavoblog_avatar_height" value="{{ settings.pavoblog_avatar_height is defined ? settings.pavoblog_avatar_height : 54 }}" placeholder="{{ text_height }}" class="form-control" />
+							                  	{% if errors.error_pavoblog_avatar_height %}
+													<div class="text-danger">{{ errors.error_pavoblog_avatar_height }}</div>
 												{% endif %}
 						                  	</div>
 						                </div>

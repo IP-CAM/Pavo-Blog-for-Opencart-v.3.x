@@ -36,6 +36,7 @@ $_['text_date_time_format']		= 'Date Time Format';
 $_['text_pagination_type']		= 'Pavo Pagination';
 $_['text_pagination_desc']		= 'Use Pavo Pagination or Default Pagination?';
 $_['text_default_style']		= 'Default Style';
+$_['text_none']					= 'None';
 
 // posts
 $_['title_text']				= 'Title';
@@ -96,6 +97,8 @@ $_['entry_limit_desc_title']	= 'In the list view, short description character li
 $_['entry_desc_limit_plc']		= 'List Description Limit';
 $_['entry_post_image_thumb']	= 'Post Image Thumb Size (W x H)';
 $_['entry_single_post_image']	= 'Post Image Single (W x H)';
+$_['entry_avatar_image']		= 'Author Avatar (W x H)';
+$_['text_reply']				= 'Allow reply comment';
 
 //
 $_['entry_text_keyword'] 		= 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';

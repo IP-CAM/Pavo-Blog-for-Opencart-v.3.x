@@ -1,27 +1,30 @@
 {% if comment %}
-	<li class="comment">
-		<div class="avatar">
-			<img src="{{ comment.thumb }}" />
+	<li class="comment row" data-comment="{{ comment.comment_id }}">
+		<div class="avatar col-sm-1">
+			<img src="{{ comment.thumb }}" alt="{{ comment.comment_name }}" />
 		</div>
-		<div class="comment-content">
-			<div class="name">
-				{% if comment.user_id %}
-					<a href="{{ comment.user_href }}">{{ comment.username }}</a>
-				{% else %}
-					{{ comment.username }}
-				{% endif %}
-			</div>
+		<div class="comment-content col-sm-11">
+			<header>
+				<div class="name">
+					<strong>{{ comment.comment_name }}</strong>
+				</div>
+				<div class="comment-date">
+					<time>{{ comment.date_added | date( [ date_format, ' ', time_format ] | join() ) }}</time>
+				</div>
+			</header>
 			{% if comment.comment_title %}
 				<div class="comment-title">
-					<h4>{{ comment.title }}</h4>
+					<h4>{{ comment.comment_title }}</h4>
 				</div>
 			{% endif %}
-			{% if comment.content %}
-				<div class="comment-content">
-					{{ comment.content }}
+			{% if comment.comment_text %}
+				<div class="comment-text">
+					{{ comment.comment_text }}
 				</div>
-				{% if reply %}
-					<i class="fa fa-reply"></i>
+				{% if can_reply %}
+					<p>
+						<a href="#" class="reply-comment"><i class="fa fa-reply"></i> {{ text_reply }}</a>
+					</p>
 					{% if comment.comments %}
 						<div class="comment-list">
 							<ol>

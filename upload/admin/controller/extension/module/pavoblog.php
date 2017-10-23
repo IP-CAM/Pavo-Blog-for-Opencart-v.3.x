@@ -508,7 +508,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	 * validate category form
 	 */
 	protected function validateCategoryForm() {
-		if ( ! $this->user->hasPermission( 'modify', 'extension/module/pavoblog/category' )) {
+		if ( ! $this->user->hasPermission( 'modify', 'extension/module/pavoblog/category' ) ) {
 			$this->errors['warning'] = $this->language->get( 'error_permission' );
 		}
 
@@ -608,16 +608,24 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		if ( empty( $this->request->post['pavoblog_post_limit'] ) ) {
 			$this->errors['error_pavoblog_post_limit'] = $this->language->get( 'error_pavoblog_post_limit' );
 		}
-
 		if ( empty( $this->request->post['pavoblog_post_description_length'] ) ) {
 			$this->errors['error_pavoblog_post_description_length'] = $this->language->get( 'error_pavoblog_post_description_length' );
 		}
 
+		// thumb
 		if ( empty( $this->request->post['pavoblog_image_thumb_width'] ) ) {
 			$this->errors['error_pavoblog_image_thumb_width'] = $this->language->get( 'error_pavoblog_image_thumb_width' );
 		}
 		if ( empty( $this->request->post['pavoblog_image_thumb_height'] ) ) {
 			$this->errors['error_pavoblog_image_thumb_height'] = $this->language->get( 'error_pavoblog_image_thumb_height' );
+		}
+
+		// avatar
+		if ( empty( $this->request->post['pavoblog_avatar_width'] ) ) {
+			$this->errors['error_pavoblog_avatar_width'] = $this->language->get( 'error_pavoblog_image_thumb_width' );
+		}
+		if ( empty( $this->request->post['pavoblog_avatar_height'] ) ) {
+			$this->errors['error_pavoblog_avatar_height'] = $this->language->get( 'error_pavoblog_image_thumb_height' );
 		}
 
 		if ( $this->errors && ! isset( $this->errors['warning'] ) ) {
@@ -735,18 +743,34 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->db->query("
 			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_comment` (
 			  `comment_id` int(11) NOT NULL AUTO_INCREMENT,
-			  `email` varchar(96) NOT NULL,
-			  `post_id` int(11) NOT NULL,
-			  `user_id` int(11) NOT NULL DEFAULT '0',
-			  `author` varchar(64) NOT NULL,
-			  `text` text NOT NULL,
-			  `rating` int(1) NOT NULL,
-			  `status` tinyint(1) NOT NULL DEFAULT '0',
-			  `parent_id` int(11) NOT NULL DEFAULT '0',
+			  `comment_title` varchar(255) NULL,
+			  `comment_email` varchar(96) NOT NULL,
+			  `comment_post_id` int(11) NOT NULL,
+			  `comment_user_id` int(11) NOT NULL DEFAULT '0',
+			  `comment_customer_id` int(11) NOT NULL DEFAULT '0',
+			  `comment_name` varchar(64) NOT NULL,
+			  `comment_text` text NOT NULL,
+			  `comment_rating` int(1) NOT NULL,
+			  `comment_status` tinyint(1) NOT NULL DEFAULT '0',
+			  `comment_parent_id` int(11) NOT NULL DEFAULT '0',
+			  `comment_subscribe` tinyint(1) NOT NULL DEFAULT '0',
+			  `comment_store_id` int(11) NOT NULL DEFAULT '0',
+			  `comment_language_id` int(11) NOT NULL DEFAULT '0',
 			  `date_added` datetime NOT NULL,
 			  `date_modified` datetime NOT NULL,
 			  PRIMARY KEY (`comment_id`),
-			  KEY `post_id` (`post_id`)
+			  KEY `comment_post_id` (`comment_post_id`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+		");
+
+		// comment subscribe
+		$this->db->query("
+			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_subscribe_post` (
+			  `subscribe_id` int(11) NOT NULL AUTO_INCREMENT,
+			  `subscribe_email` varchar(96) NOT NULL,
+			  PRIMARY KEY (`subscribe_id`),
+			  UNIQUE (subscribe_email)
+			  KEY `subscribe_id` (`subscribe_id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 		");
 	}
@@ -786,7 +810,10 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			'pavoblog_post_limit'				=> 10,
 			'pavoblog_post_description_length'	=> 200,
 			'pavoblog_image_thumb_width'		=> 370,
-			'pavoblog_image_thumb_height'		=> 210
+			'pavoblog_image_thumb_height'		=> 210,
+			'pavoblog_auto_approve_comment'		=> 1,
+			'pavoblog_comment_avatar_width'		=> 54,
+			'pavoblog_comment_avatar_height'	=> 54
 		), $settings );
 		$this->model_setting_setting->editSetting( 'pavoblog', $settings, $this->config->get( 'config_store_id' ) );
 	}

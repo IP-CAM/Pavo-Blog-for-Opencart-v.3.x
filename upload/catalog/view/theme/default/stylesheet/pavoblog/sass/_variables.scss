@@ -1,12 +1,17 @@
 // main
+$font-size-lg 					: 16px ! default;
 $font-size 						: 14px ! default;
 $font-size-sm 					: 13px ! default;
 $font-color 					: #555;
 $font-weight 					: 400;
+$font-weight-lg 				: 600;
 $link-color 					: $font-color ! default;
 $link-color-hover 				: #74a4fb ! default;
 $line-height 					: 1.5 ! default;
+$main-border-color 				: #eee ! default;
 
+$warning-color 					: #F44336;
+$success-color 					: #8BC34A;
 $white 							: #fff;
 $black 							: #000;
 

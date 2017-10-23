@@ -1,162 +1,31 @@
 @import './sass/variables';
 @import './sass/mixins';
+@import './sass/posts';
+@import './sass/comments';
 
 .pavo-btn-info {
     @include button( $font-size, $font-color, $white, $btn-padding, $btn-background, $btn-primary-background-hover, $btn-border, $btn-primary-border-hover );
 }
-.pavo-form-control{
-	width: 100%;
-	font-size: $font-size;
-	padding: $btn-padding;
-	margin-bottom: 10px;
-	border: $btn-border;
-	transition: border 0.3s;
-	-moz-transition: border 0.3s;
-	-webkit-transition: border 0.3s;
-	-o-transition: border 0.3s;
-	-ms-transition: border 0.3s;
 
-	&:focus{
-		border: $btn-primary-border-hover;
-		outline: none;
-	}
-}
-.pavoblog-posts,
-.pavoblog-post{
-	h1, h2, h3, h4, h5, h6{
-		font-weight: $heading-font-weight;
-		color: $heading-font-color;
-		line-height: $heading-lineheight;
-		&:hover{
-			color: $heading-font-color-hover;
-		}
-	}
-	h1, h1 > *{
-		font-size: 26px;
-	}
-	h2, h2 > *{
-		font-size: 24px;
-	}
-	h3, h3 > *{
-		font-size: 22px;
-	}
-	h4, h4 > *{
-		font-size: 20px;
-	}
-	h5, h5 > *{
-		font-size: 18px;
-	}
-	h6, h6 > *{
-		font-size: 16px;
-	}
-}
-// archives
-.pavoblog-posts,
-.pavoblog-post{
-	
-	display: flex;
-	display: -webkit-flex;
-	-webkit-flex-wrap: wrap;
-	flex-wrap: wrap;
-
-	* {
-		font-size: $font-size;
-		color: $font-color;
-		font-weight: $font-weight;
-		line-height: $line-height;
-	}
-
-	a{
-		&:hover,
-		&:focus{
-			outline: none;
-			text-decoration: none;
-			color: $link-color-hover;
-		}
-	}
-
-	.post-item{
-		float: left;
-		margin-bottom: 15px;
-
-		&.post-list{
-			.thumb{
-				margin-right: 20px;
-				float: left;
-			}
-		}
-
-		.readmore-text{
-			@include button( $font-size, $font-color, $white, $btn-padding, $btn-background, $btn-primary-background-hover, $btn-border, $btn-primary-border-hover );
-		}
-	}
-	.entry-content{
-		margin-bottom: 10px;
-		overflow: hidden;
-
-		.entry-title,
-		.entry-title a{
-			font-size: $heading-font-size;
-			font-weight: $heading-font-weight;
-			color: $heading-font-color;
-			line-height: $heading-lineheight;
-
-			&:hover{
-				color: $heading-font-color-hover;
-			}
-		}
-	}
-	.entry-meta{
-		overflow: hidden;
-		*{
-			font-size: $font-size-sm;
-		}
-		> div{
-			float: left;
-			&:first-child{
-				margin-right: 15px;
-			}
-			i{
-				margin-right: 5px;
-			}
-		}
-	}
-	.entry-description,
-	entry-content{
-		clear: both;
-		margin-top: 10px;
-	}
-}
-.pavoblog-pagination{
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	li{
-		display: inline-block;
-		a,
-		span{
-			@include button( $font-size, $font-color, $white, $btn-padding, $btn-background, $btn-primary-background-hover, $btn-border, $btn-primary-border-hover );
-			line-height: 1;
-			padding: 8px 15px;
-		}
-
-		&:not(:last-child) {
-			margin-right: 3px;
-		}
-
-		&.active{
-			a,
-			span{
-				background-color: $btn-primary-background-hover;
-				border: $btn-primary-border-hover;
-				color: $white;
-			}
-		}
+.pavoblog-notice{
+	padding: 5px 8px;
+	margin-bottom: 7px;
+	&.warning{
+		background-color: $warning-color;
+		color: $white;
 	}
 }
 
-.comment-form{
+.has-error{
+	.required{
+		border: 1px solid $warning-color;
+	}
 	p{
-		margin-bottom: 10px;
+		color: $warning-color;
+	}
+}
+.validated{
+	.required{
+		border: 1px solid $success-color;
 	}
 }

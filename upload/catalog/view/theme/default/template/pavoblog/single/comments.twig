@@ -1,12 +1,16 @@
-{% if ( post.comments ) %}
-	{% set comments = post.comments %}
-	<div class="comment-list">
-		<ol>
+<div id="pavoblog-comments">
+	{% if ( comments ) %}
+		<h3>
+			{{ text_comments }}
+			<span class="comment-count">({{ comment_count }})</span>
+		</h3>
+		<ol class="comment-list">
 			{% for comment in comments %}
 				{% include 'pavoblog/comment/loop-comment.twig' with { 'comment' : comment } %}
 			{% endfor %}
 		</ol>
-	</div>
-{% endif %}
+			
+	{% endif %}
 
-{% include '/pavoblog/comment/comment-form.twig' with { 'user' : user } %}
+	{% include '/pavoblog/comment/comment-form.twig' %}
+</div>
