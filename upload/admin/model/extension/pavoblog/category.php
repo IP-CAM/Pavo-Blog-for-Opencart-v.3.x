@@ -9,7 +9,7 @@ class ModelExtensionPavoblogCategory extends Model {
 		$args = array_merge( array(
 				'parent_id'		=> '',
 				'status'		=> '',
-				'order'			=> 'ASC',
+				'order'			=> 'DESC',
 				'orderby'		=> 'category_id',
 				'start'			=> 0,
 				'limit'			=> $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10,
@@ -73,7 +73,7 @@ class ModelExtensionPavoblogCategory extends Model {
 	 * get single category
 	 * @param $category_id
 	 */
-	public function get( $category_id = null ) {
+	public function getCategory( $category_id = null ) {
 		$sql = 'SELECT * FROM ' . DB_PREFIX . 'pavoblog_category AS category WHERE category_id = ' . $category_id;
 		$query = $this->db->query( $sql );
 
@@ -130,7 +130,7 @@ class ModelExtensionPavoblogCategory extends Model {
 	/**
 	 * create - update category
 	 */
-	public function add( $data = array() ) {
+	public function addCategory( $data = array() ) {
 		$params = array(
 			'image' 	=> ! empty( $data['image'] ) 		? $this->db->escape( $data['image'] ) : '',
 			'parent_id' => ! empty( $data['parent_id'] ) 	? (int)$data['parent_id'] : 0,
@@ -173,7 +173,7 @@ class ModelExtensionPavoblogCategory extends Model {
 	/**
 	 * edit category
 	 */
-	public function edit( $category_id, $data = array() ) {
+	public function editCategory( $category_id, $data = array() ) {
 		$params = array(
 			'image' 	=> ! empty( $data['image'] ) 		? $this->db->escape( $data['image'] ) : '',
 			'parent_id' => ! empty( $data['parent_id'] ) 	? (int)$data['parent_id'] : 0,

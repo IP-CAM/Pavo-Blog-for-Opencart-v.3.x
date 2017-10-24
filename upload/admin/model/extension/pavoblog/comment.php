@@ -40,8 +40,8 @@ class ModelExtensionPavoblogComment extends Model {
 				'user_id'		=> 0,
 				'parent_id'		=> '',
 				'approved'		=> '',
-				'order'			=> '',
-				'orderby'		=> '',
+				'order'			=> 'DESC',
+				'orderby'		=> 'comment_id',
 				'limit'			=> $this->config->get('pavoblog_post_limit'),
 				'start'			=> 0
 			), $args );

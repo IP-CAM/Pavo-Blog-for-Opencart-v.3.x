@@ -13,7 +13,7 @@ class ControllerExtensionPavoBlogSingle extends Controller{
 
 		$data = array();
 
-		$post_id = isset( $this->request->get['post_id'] ) ? abs( $this->request->get['post_id'] ) : false;
+		$post_id = isset( $this->request->get['pavo_post_id'] ) ? abs( $this->request->get['pavo_post_id'] ) : false;
 		if ( ! $post_id ) {
 			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link('error', '') ) ); exit();
 		}
@@ -29,7 +29,7 @@ class ControllerExtensionPavoBlogSingle extends Controller{
 		);
 		$data['breadcrumbs'][] = array(
 			'text'	=> $post['name'],
-			'href'	=> $this->url->link( 'extension/pavoblog/single', 'post_id=' . $post['post_id'] )
+			'href'	=> $this->url->link( 'extension/pavoblog/single', 'pavo_post_id=' . $post['post_id'] )
 		);
 		if ( empty( $post['post_type'] ) ) {
 			$post['post_type'] = 'image';

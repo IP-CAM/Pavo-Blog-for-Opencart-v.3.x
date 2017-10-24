@@ -6,7 +6,7 @@ class ControllerExtensionPavoBlogComment extends Controller {
 	private $errors = array();
 
 	public function index() {
-		if ( empty( $this->request->get['post_id'] ) ) {
+		if ( empty( $this->request->get['pavo_post_id'] ) ) {
 			return;
 		}
 
@@ -14,7 +14,7 @@ class ControllerExtensionPavoBlogComment extends Controller {
 		$this->load->model( 'extension/pavoblog/comment' );
 
 		$this->data['logged_in'] = ( $this->user->getId() || $this->data['logged_in'] ) ? true : false;
-		$post_id = (int)$this->request->get['post_id'];
+		$post_id = (int)$this->request->get['pavo_post_id'];
 
 		$this->data['comment_name'] = $this->data['comment_title'] = $this->request->post['comment_email'] = '';
 		if ( isset( $this->session->data['comment_data'] ) && ! empty( $this->session->data['comment_data']['comment_title'] ) ) {
@@ -83,13 +83,13 @@ class ControllerExtensionPavoBlogComment extends Controller {
 				$this->sendEmailSubcribed( $post_id, array( $email ) );
 			}
 
-			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/pavoblog/single', 'post_id=' . (int)$this->request->post['comment_post_id'] ) ) );
+			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/pavoblog/single', 'pavo_post_id=' . (int)$this->request->post['comment_post_id'] ) ) );
 		} else {
 			$this->session->data['comment_errors'] = $this->errors;
 			$this->session->data['comment_data'] = $this->request->post;
 		}
 
-		$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/pavoblog/single', 'post_id=' . (int)$this->request->post['comment_post_id'] ) ) ); exit();
+		$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/pavoblog/single', 'pavo_post_id=' . (int)$this->request->post['comment_post_id'] ) ) ); exit();
 	}
 
 	/**
@@ -108,7 +108,7 @@ class ControllerExtensionPavoBlogComment extends Controller {
 			if ( in_array( $subcribe['comment_email'], $ignores ) ) continue;
 
 			$data = array();
-			$href = $this->url->link( 'extension/pavoblog/single', 'post_id=' . $subcribe['comment_post_id'] );
+			$href = $this->url->link( 'extension/pavoblog/single', 'pavo_post_id=' . $subcribe['comment_post_id'] );
 			$post_name = ! empty( $subcribe['name'] ) ? html_entity_decode( $subcribe['name'], ENT_QUOTES, 'UTF-8' ) : '';
 			$store_info = $this->model_setting_store->getStore($subcribe['comment_store_id']);
 

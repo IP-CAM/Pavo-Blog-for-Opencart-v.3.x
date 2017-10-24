@@ -21,6 +21,36 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/post' );
 
+		if ( $this->request->server['REQUEST_METHOD'] === 'POST' ) {
+			if ( $this->user->hasPermission( 'modify', 'extension/module/pavoblog/post' ) ) {
+				$selected = ! empty( $this->request->post['selected'] ) ? $this->request->post['selected'] : array();
+				if ( $selected ) {
+					foreach ( $selected as $post_id ) {
+						$this->model_extension_pavoblog_post->deletePost( $post_id );
+					}
+					$this->session->data['post_success'] = $this->language->get( 'text_posts_deleted' );
+				} else {
+					$this->session->data['post_error'] = $this->language->get( 'error_no_select_post' );
+				}
+			} else {
+				$this->session->data['post_error'] = $this->language->get( 'error_permission' );
+			}
+
+			$this->response->redirect( $this->url->link( 'extension/module/pavoblog/posts', 'user_token=' . $this->session->data['user_token'], true ) ); exit();
+		}
+
+		// has error message
+		if ( ! empty( $this->session->data['post_error'] ) ) {
+			$this->errors['error_warning'] = $this->session->data['post_error'];
+			unset( $this->session->data['post_error'] );
+		}
+
+		// has success message
+		if ( ! empty( $this->session->data['post_success'] ) ) {
+			$this->data['success'] = $this->session->data['post_success'];
+			unset( $this->session->data['post_success'] );
+		}
+
 		/**
 		 * breadcrumbs data
 		 */
@@ -335,9 +365,9 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$category_id = isset( $this->request->get['category_id'] ) ? $this->request->get['category_id'] : 0;
 		if ( $this->request->server['REQUEST_METHOD'] === 'POST' && $this->validateCategoryForm() ) {
 			if ( $category_id ) {
-				$this->model_extension_pavoblog_category->edit( $category_id, $this->request->post );
+				$this->model_extension_pavoblog_category->editCategory( $category_id, $this->request->post );
 			} else {
-				$category_id = $this->model_extension_pavoblog_category->add( $this->request->post );
+				$category_id = $this->model_extension_pavoblog_category->addCategory( $this->request->post );
 			}
 			$this->session->data['success'] = $this->language->get( 'text_success' );
 
@@ -382,7 +412,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 
    		// languages
 		$this->data['languages'] = $this->model_localisation_language->getLanguages();
-		$this->data['category'] = $this->model_extension_pavoblog_category->get( $category_id );
+		$this->data['category'] = $this->model_extension_pavoblog_category->getCategory( $category_id );
 
 		$this->data['category_data'] = array();
 		if ( ! empty( $this->request->post['category_data'] ) ) {
@@ -857,6 +887,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 				`status` tinyint(1) NOT NULL,
 				`featured` tinyint(1) NOT NULL,
 				`user_id` int(11) NOT NULL,
+				`type` varchar(20) NOT NULL,
 				`date_added` datetime NOT NULL,
 				`date_modified` datetime NOT NULL,
 				PRIMARY KEY (`post_id`)

@@ -9,7 +9,7 @@ class ModelExtensionPavoblogPost extends Model {
 		$args = array_merge( array(
 				'limit'				=> $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10,
 				'start'				=> 0,
-				'order'				=> 'ASC',
+				'order'				=> 'DESC',
 				'orderby'			=> 'post_id',
 				'language_id'		=> $this->config->get( 'config_language_id' )
 			), $args );
@@ -42,6 +42,7 @@ class ModelExtensionPavoblogPost extends Model {
 
 				default:
 						$orderby = 'posts.post_id';
+						$order = 'DESC';
 					break;
 			}
 			$sql .= " ORDER BY {$orderby} {$order}";
@@ -100,14 +101,15 @@ class ModelExtensionPavoblogPost extends Model {
 				'date_added'		=> '',
 				'dated_modifed'		=> '',
 				'viewed'			=> '',
+				'type'				=> 'image',
 				'post_data'			=> array(),
 				'post_seo_url'		=> array(),
 				'post_store'		=> array()
 			), $data );
 
 		extract( $data );
-		$sql = "INSERT INTO " . DB_PREFIX . "pavoblog_post (`image`, `viewed`, `status`, `featured`, `user_id`, `date_added`, `date_modified`)";
-		$sql .= " VALUES ( '". $this->db->escape( $image ) ."', '".(int)$viewed."', '".(int)$status."', '".(int)$featured."', '".(int)$user_id."', '" . ( $date_added ? $this->db->escape( $date_added ) : 'NOW()' ) . "', NOW() )";
+		$sql = "INSERT INTO " . DB_PREFIX . "pavoblog_post (`image`, `viewed`, `status`, `featured`, `user_id`, `type`, `date_added`, `date_modified`)";
+		$sql .= " VALUES ( '". $this->db->escape( $image ) ."', '".(int)$viewed."', '".(int)$status."', '".(int)$featured."', '".(int)$user_id."', '".$this->db->escape( $type )."', '" . ( $date_added ? $this->db->escape( $date_added ) : 'NOW()' ) . "', NOW() )";
 
 		$this->db->query( $sql );
 		$post_id = $this->db->getLastId();
@@ -204,7 +206,7 @@ class ModelExtensionPavoblogPost extends Model {
 	/**
 	 * delete post
 	 */
-	public function delete( $post_id = null ) {
+	public function deletePost( $post_id = null ) {
 		$sql = "DELETE FROM " . DB_PREFIX . "pavoblog_post WHERE ID = " . $post_id;
 		$this->db->query( $sql );
 
