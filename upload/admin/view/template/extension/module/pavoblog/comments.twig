@@ -38,14 +38,14 @@
 								        <tr>
 											<td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>
 											<td class="text-left">
-												{% if sort == 'lastname' %}
+												{% if sort == 'email' %}
 													<a href="{{ sort_email }}" class="{{ order|lower }}">{{ entry_email_text }}</a>
 												{% else %}
 													<a href="{{ sort_email }}">{{ entry_email_text }}</a>
 												{% endif %}
 											</td>
 											<td class="text-left">
-												{% if sort == 'author' %}
+												{% if sort == 'name' %}
 													<a href="{{ sort_author }}" class="{{ order|lower }}">{{ author_text }}</a>
 												{% else %}
 													<a href="{{ sort_author }}">{{ author_text }}</a>
@@ -80,7 +80,9 @@
 												</td>
 												<td class="text-left">{{ comment.comment_email }}</td>
 												<td class="text-left">{{ comment.comment_name }}</td>
-												<td class="text-left">{{ comment.name }}</td>
+												<td class="text-left">
+													<a href="{{ comment.edit_post_link }}">{{ comment.name }}</a>
+												</td>
 												<td class="text-left">{{ comment.comment_text }}</td>
 												<td class="text-right">{{ comment.date_added }}</td>
 												<td class="text-right">

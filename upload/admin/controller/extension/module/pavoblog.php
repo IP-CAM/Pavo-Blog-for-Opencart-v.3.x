@@ -41,17 +41,32 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$paged = ! empty( $this->request->get['page'] ) ? (int)$this->request->get['page'] : 1;
 		$limited = $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10;
 
-		$this->data['posts'] = $this->model_extension_pavoblog_post->getPosts( array(
-				'start'	=> $paged ? ( $paged - 1 ) * $limited : 0,
-				'limit'	=> $limited
-			) );
+        $this->data['sort'] = $order = isset( $this->request->get['sort'] ) ? $this->request->get['sort'] : '';
+        $this->data['order'] = $sort = isset( $this->request->get['order'] ) ? $this->request->get['order'] : '';
+        $args = array(
+        	'start'	=> $paged ? ( $paged - 1 ) * $limited : 0,
+			'limit'	=> $limited
+        );
+        if ( $order && $sort ) {
+        	$args['orderby'] = $order;
+        	$args['order'] = $sort;
+        }
+
+		$rsort = $sort == 'desc' ? 'asc' : 'desc';
+        $this->data['sort_title'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/posts', 'sort=title&order='.$rsort.'&user_token=' . $this->session->data['user_token'].'&type=module', 'SSL' ) );
+        $this->data['sort_author'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/posts', 'sort=author&order='.$rsort.'&user_token=' . $this->session->data['user_token'].'&type=module', 'SSL' ) );
+        $this->data['sort_date_added'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/posts', 'sort=date&order='.$rsort.'&user_token=' . $this->session->data['user_token'].'&type=module', 'SSL' ) );
+
+		$this->data['posts'] = $this->model_extension_pavoblog_post->getPosts( $args );
+		$this->data['date_format'] = $this->config->get( 'pavoblog_date_format' );
+		$this->data['time_format'] = $this->config->get( 'pavoblog_time_format' );
 
 		$total = $this->model_extension_pavoblog_post->getTotals();
 		$pagination = new Pagination();
         $pagination->total = $total;
         $pagination->page = $paged;
         $pagination->limit = $limited;
-        $pagination->url = $this->url->link('extension/module/pavoblog/posts', 'user_token=' . $this->session->data['user_token'] . '&paged={page}', true);
+        $pagination->url = $this->url->link('extension/module/pavoblog/posts', 'user_token=' . $this->session->data['user_token'] . '&page={page}', true);
 
         $this->data['pagination'] = $pagination->render();
         $this->data['results'] = sprintf(
@@ -214,6 +229,20 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/category' );
 
+		if ( $this->request->server['REQUEST_METHOD'] === 'POST' ) {
+			$selected = ! empty( $this->request->post['selected'] ) ? $this->request->post['selected'] : array();
+			if ( $selected ) {
+				foreach( $selected as $category_id ) {
+					$this->model_extension_pavoblog_category->deleteCategory( $category_id );
+				}
+				$this->session->data['category_success'] = $this->language->get( 'text_categories_deleted' );
+			} else {
+				$this->session->data['category_error'] = $this->language->get( 'error_no_select_category' );
+			}
+
+			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'], true ) ) );
+		}
+
 		/**
 		 * breadcrumbs data
 		 */
@@ -239,20 +268,29 @@ class ControllerExtensionModulePavoBlog extends Controller {
    		$this->data['action']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'], true ) );
    		$this->data['add_new_url']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true ) );
 
+   		$this->data['sort'] = isset( $this->request->get['sort'] ) ? $this->request->get['sort'] : '';
+   		$this->data['order'] = isset( $this->request->get['order'] ) ? $this->request->get['order'] : '';
+
 		// categories
 		$paged = isset( $this->request->get['page'] ) && is_int( $this->request->get['page'] ) ? (int)$this->request->get['page'] : 1;
 		$limited = $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10;
-   		$this->data['categories'] = $this->model_extension_pavoblog_category->getAll( array(
+		$args = array(
    			'start'		=> $paged ? ( $paged - 1 ) * $limited : 0,
    			'limit'		=> $limited
-   		) );
+   		);
+
+   		if ( $this->data['sort'] && $this->data['order'] ) {
+   			$args['orderby'] = $this->data['sort'];
+   			$args['order'] = $this->data['order'];
+   		}
+   		$this->data['categories'] = $this->model_extension_pavoblog_category->getCategories( $args );
 
    		$total = $this->model_extension_pavoblog_category->getTotals();
 		$pagination = new Pagination();
         $pagination->total = $total;
         $pagination->page = $paged;
         $pagination->limit = $limited;
-        $pagination->url = $this->url->link('extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'] . '&paged={page}', true);
+        $pagination->url = $this->url->link('extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'] . '&page={page}', true);
 
         $this->data['pagination'] = $pagination->render();
         $this->data['results'] = sprintf(
@@ -270,6 +308,8 @@ class ControllerExtensionModulePavoBlog extends Controller {
    			}
    		}
 
+   		$this->data['sort_link'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/categories', 'sort=name&order='.( $this->data['order'] == 'desc' ? 'asc' : 'desc' ).'user_token=' . $this->session->data['user_token'], true ) );
+   		$this->data['delete'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'], true ) );
 		// set page document title
 		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'categories_heading_title' ) );
 		$this->data['errors'] = $this->errors;
@@ -362,7 +402,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->data['category_store'] 		= $category_id ? $this->model_extension_pavoblog_category->getCategoryStore( $category_id ) : array();
 
 		// categories
-   		$this->data['categories'] = $this->model_extension_pavoblog_category->getAll();
+   		$this->data['categories'] = $this->model_extension_pavoblog_category->getCategories();
 
    		$action_url = $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true );
    		if ( $category_id ) {
@@ -433,8 +473,49 @@ class ControllerExtensionModulePavoBlog extends Controller {
    			unset( $this->session->data['comment_success'] );
    		}
 
+   		$orderby = isset( $this->request->get['sort'] ) ? $this->request->get['sort'] : '';
+   		$order = isset( $this->request->get['order'] ) ? $this->request->get['order'] : '';
+
+   		$paged = isset( $this->request->get['page'] ) ? (int)$this->request->get['page'] : 1;
+   		$limited = $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10;
+   		$this->data['sort'] = $orderby;
+   		$this->data['order'] = $order;
+
 		// comments
-   		$this->data['comments'] = $this->model_extension_pavoblog_comment->getComments();
+		$args = array(
+   			'start'	=> ( $paged - 1 ) * $limited,
+   			'limit'	=> $limited
+   		);
+
+		if ( $order && $orderby ) {
+			$args = array_merge( array(
+				'orderby'		=> $orderby,
+				'order'			=> $order
+			), $args );
+		}
+
+		$order = strtolower( $this->data['order'] ) == 'asc' ? 'desc' : 'asc';
+		$this->data['sort_email'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/comments', 'sort=email&order='.$order.'&user_token=' . $this->session->data['user_token'].'&type=module', 'SSL' ) );
+		$this->data['sort_author'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/comments', 'sort=name&order='.$order.'&user_token=' . $this->session->data['user_token'].'&type=module', 'SSL' ) );
+		$this->data['sort_date_added'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/comments', 'sort=date&order='.$order.'&user_token=' . $this->session->data['user_token'].'&type=module', 'SSL' ) );
+   		$this->data['comments'] = $this->model_extension_pavoblog_comment->getComments( $args );
+
+   		$total = $this->model_extension_pavoblog_comment->getTotals();
+		$pagination = new Pagination();
+        $pagination->total = $total;
+        $pagination->page = $paged;
+        $pagination->limit = $limited;
+        $pagination->url = $this->url->link('extension/module/pavoblog/comments', 'user_token=' . $this->session->data['user_token'] . '&page={page}', true);
+
+        $this->data['pagination'] = $pagination->render();
+        $this->data['results'] = sprintf(
+        	$this->language->get('text_pagination'),
+        	($total) ? ( ($paged - 1) * $limited + 1 ) : 0,
+        	( (($paged - 1) * $limited) > ($total - $limited) ) ? $total : ( ( ($paged - 1) * $limited ) + $limited ),
+        	$total,
+        	ceil( $total / $limited )
+        );
+
    		// delete comments
    		$this->data['delete'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/comments', 'user_token=' . $this->session->data['user_token'], true ) );
 		// set page document title

@@ -27,11 +27,14 @@ class ModelExtensionPavoblogPost extends Model {
 				case 'ID':
 						$orderby = 'posts.post_id';
 					break;
-				case 'date_added':
-						$orderby = 'posts.date_added';
+				case 'title':
+						$orderby = 'post_desc.name';
 					break;
-				case 'date_modified':
-						$orderby = 'posts.date_modified';
+				case 'author':
+						$orderby = 'u.username';
+					break;
+				case 'date':
+						$orderby = 'posts.date_added';
 					break;
 				case 'user_id':
 						$orderby = 'posts.user_id';

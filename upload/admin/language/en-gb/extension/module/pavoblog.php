@@ -102,12 +102,16 @@ $_['entry_avatar_image']		= 'Author Avatar (W x H)';
 $_['text_comment']				= 'Comment';
 $_['text_comment_name']			= 'Name';
 $_['text_comment_email']		= 'Email';
+$_['text_comment_status']		= 'Comment status';
 $_['text_reply']				= 'Allow reply comment';
 $_['text_approve']				= 'Approve';
 $_['text_unapprove']			= 'Unapprove';
 $_['text_comment_updated']		= 'Comment updated successfully';
 $_['text_comment_deleted']		= 'Comment deleted successfully';
 $_['text_comments_deleted']		= 'Comments deleted successfully';
+$_['text_categories_updated']	= 'Categories update successfully';
+$_['text_categories_deleted']	= 'Categories deleted successfully';
+$_['text_category_updated']		= 'Category updated successfully';
 
 //
 $_['entry_text_keyword'] 		= 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';
@@ -131,7 +135,8 @@ $_['error_pavoblog_post_limit']	= 'Items Per Page is required!';
 $_['error_pavoblog_post_description_length']	= 'Post Description Limit required!';
 $_['error_pavoblog_image_thumb_width']			= 'Thumbnail Size Width dimensions required!';
 $_['error_pavoblog_image_thumb_height']			= 'Thumbnail Size Height dimensions required!';
-$_['error_no_select_comment']	= 'Please select comment(s) before delete';
+$_['error_no_select_comment']	= 'Please select comment before delete';
+$_['error_no_select_category']	= 'Please select category before delete';
 $_['error_comment_text']		= 'Comment text is required field';
 $_['error_comment_name']		= 'Comment name is required field';
 $_['error_comment_email']		= 'Comment email is required field';

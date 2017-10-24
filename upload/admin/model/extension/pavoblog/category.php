@@ -5,7 +5,7 @@ class ModelExtensionPavoblogCategory extends Model {
 	/**
 	 * get all categories with args
 	 */
-	public function getAll( $args = array() ) {
+	public function getCategories( $args = array() ) {
 		$args = array_merge( array(
 				'parent_id'		=> '',
 				'status'		=> '',
@@ -40,7 +40,16 @@ class ModelExtensionPavoblogCategory extends Model {
 		}
 
 		if ( $order && $orderby ) {
-			$sql .= ' ORDER BY category.' . $orderby . ' ' . $order;
+			switch ( $orderby ) {
+				case 'name':
+						$orderby = 'category.name';
+					break;
+				
+				default:
+						$orderby = 'category.category_id';
+					break;
+			}
+			$sql .= " ORDER BY $orderby $order";
 		}
 
 		if ( $limit != -1 ) {
@@ -210,7 +219,7 @@ class ModelExtensionPavoblogCategory extends Model {
 	/**
 	 * delete category
 	 */
-	public function delete( $cat_id = null ) {
+	public function deleteCategory( $cat_id = null ) {
 		$this->db->query( "DELETE FROM " . DB_PREFIX . 'pavoblog_category WHERE category_id = ' . (int)$cat_id );
 		$query = $this->db->query( 'SELECT category_id FROM ' . DB_PREFIX . 'pavoblog_category WHERE parent_id = ' . (int)$cat_id );
 		if ( $query->cols ) {

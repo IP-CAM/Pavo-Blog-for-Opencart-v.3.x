@@ -7,14 +7,15 @@ class ModelExtensionPavoblogComment extends Model {
 	 */
 	public function updateComment( $data = array() ) {
 		$data = array_merge( array(
-			'comment_id'	=> '',
-			'comment_text'	=> '',
-			'comment_name'	=> '',
-			'comment_email'	=> ''
+			'comment_id'		=> '',
+			'comment_text'		=> '',
+			'comment_name'		=> '',
+			'comment_email'		=> '',
+			'comment_status'	=> ''
 		), $data );
 		extract( $data );
 
-		$sql = "UPDATE " . DB_PREFIX . "pavoblog_comment SET `comment_text` = '".$this->db->escape( $comment_text )."', `comment_name` = '".$this->db->escape( $comment_name )."', `comment_email` = '".$this->db->escape( $comment_email )."' WHERE comment_id = " . (int)$comment_id;
+		$sql = "UPDATE " . DB_PREFIX . "pavoblog_comment SET `comment_text` = '".$this->db->escape( $comment_text )."', `comment_name` = '".$this->db->escape( $comment_name )."', `comment_email` = '".$this->db->escape( $comment_email )."', `comment_status` = ".(int)$comment_status." WHERE comment_id = " . (int)$comment_id;
 		$this->db->query( $sql );
 
 		return $this->db->countAffected();
@@ -33,7 +34,7 @@ class ModelExtensionPavoblogComment extends Model {
 	 * get comments
 	 */
 	public function getComments( $args = array() ) {
-		$args = array_merge( $args, array(
+		$args = array_merge( array(
 				'comment_id'	=> 0,
 				'post_id'		=> 0,
 				'user_id'		=> 0,
@@ -41,14 +42,14 @@ class ModelExtensionPavoblogComment extends Model {
 				'approved'		=> '',
 				'order'			=> '',
 				'orderby'		=> '',
-				'comments_per_page'=> 10,
-				'paged'			=> 0
-			) );
+				'limit'			=> $this->config->get('pavoblog_post_limit'),
+				'start'			=> 0
+			), $args );
 		extract( $args );
 
-		$sql = 'SELECT comment.*, postdsc.* FROM ' . DB_PREFIX . 'pavoblog_comment AS comment';
+		$sql = 'SELECT SQL_CALC_FOUND_ROWS comment.*, postdsc.* FROM ' . DB_PREFIX . 'pavoblog_comment AS comment';
 		$sql .= ' INNER JOIN ' . DB_PREFIX . 'pavoblog_post_description AS postdsc ON postdsc.post_id = comment.comment_post_id AND comment.comment_language_id = postdsc.language_id';
-		$where = $limit = array();
+		$where = array();
 
 		if ( $comment_id ) {
 			$where[] = 'comment_id = ' . $comment_id;
@@ -78,12 +79,28 @@ class ModelExtensionPavoblogComment extends Model {
 		}
 
 		if ( $order && $orderby ) {
-			$sql .= ' ORDER BY ' . $orderby . ' ' . $order;
+			switch ( $orderby ) {
+				case 'email':
+						$orderby = 'comment.comment_email';
+					break;
+				case 'name':
+						$orderby = 'comment.comment_name';
+					break;
+				case 'date':
+						$orderby = 'comment.date_added';
+					break;
+
+				default:
+						$orderby = 'comment.comment_id';
+						$order = 'DESC';
+					break;
+			}
+
+			$sql .= " ORDER BY $orderby $order";//echo " ORDER BY $orderby $order"; die();
 		}
 
-		if ( $comments_per_page && $paged ) {
-			$start = ( $paged - 1 ) * $comments_per_page;
-			$sql .= " LIMIT $start, $comments_per_page";
+		if ( $start !== false && $limit ) {
+			$sql .= " LIMIT $start, $limit";
 		}
 
 		$query = $this->db->query( $sql );
@@ -91,6 +108,7 @@ class ModelExtensionPavoblogComment extends Model {
 		$results = array();
 		if ( $query->rows ) foreach ( $query->rows as $row ) {
 			$row['edit_link'] = $this->url->link( 'extension/module/pavoblog/comment', 'comment_id='.(int)$row['comment_id'].'&user_token=' . $this->session->data['user_token'], true );
+			$row['edit_post_link'] = $this->url->link( 'extension/module/pavoblog/post', 'post_id='.(int)$row['comment_post_id'].'&user_token=' . $this->session->data['user_token'], true );
 			$row['delete_link'] = $this->url->link( 'extension/module/pavoblog/deleteComment', 'comment_id='.(int)$row['comment_id'].'&user_token=' . $this->session->data['user_token'], true );
 			$row['toggle_approve_link'] = $this->url->link( 'extension/module/pavoblog/toggleCommentStatus', 'comment_id='.(int)$row['comment_id'].'&user_token=' . $this->session->data['user_token'], true );
 			$results[] = $row;
@@ -117,6 +135,14 @@ class ModelExtensionPavoblogComment extends Model {
 		$query = $this->db->query( $sql );
 		// affected rows
 		return $this->db->countAffected();
+	}
+
+	public function getTotals() {
+		$query = $this->db->query( 'SELECT FOUND_ROWS()' );
+		if ( $query->row && isset( $query->row['FOUND_ROWS()'] ) ) {
+			return (int)$query->row['FOUND_ROWS()'];
+		}
+		return 0;
 	}
 
 }

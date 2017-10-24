@@ -4,7 +4,7 @@
 	    <div class="container-fluid">
 			<div class="pull-right">
 				<a href="{{ add_new_url }}" data-toggle="tooltip" title="" class="btn btn-primary" data-original-title="{{ menu_add_new_text }}"><i class="fa fa-plus"></i></a>
-				<button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger" onclick="confirm('{{ text_confirm }}') ? $('#form-upload').submit() : false;"><i class="fa fa-trash-o"></i></button>
+				<button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger" onclick="confirm('{{ text_confirm }}') ? $('#form-posts').submit() : false;"><i class="fa fa-trash-o"></i></button>
 			</div>
 			<h1>{{ heading_title }}</h1>
 			<ul class="breadcrumb">
@@ -16,7 +16,7 @@
   	</div>
   	<div class="container-fluid">
 		{% if errors.error_warning %}
-		    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+		    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ errors.error_warning }}
 	      		<button type="button" class="close" data-dismiss="alert">&times;</button>
 		    </div>
 	    {% endif %}
@@ -32,7 +32,7 @@
 						<h3 class="panel-title"><i class="fa fa-list"></i> {{ menu_posts_text }}</h3>
 					</div>
 					<div class="panel-body">
-						<form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-upload">
+						<form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-posts">
 						  	<div class="table-responsive">
 							    <table class="table table-bordered table-hover">
 							      	<thead>
@@ -53,7 +53,7 @@
 												{% endif %}
 											</td>
 											<td class="text-right">
-												{% if sort == 'date_added' %}
+												{% if sort == 'date' %}
 													<a href="{{ sort_date_added }}" class="{{ order|lower }}">{{ created_text }}</a>
 												{% else %}
 													<a href="{{ sort_date_added }}">{{ created_text }}</a>
@@ -79,7 +79,7 @@
 														{{ post.username }}
 													</a>
 												</td>
-												<td class="text-right">{{ post.date_added }}</td>
+												<td class="text-right">{{ post.date_added | date( [ date_format, ' ', time_format ] | join() ) }}</td>
 												<td class="text-right"><a href="{{ post.edit }}" data-toggle="tooltip" title="{{ edit_text }}" class="btn btn-info"><i class="fa fa-pencil"></i></a></td>
 											</tr>
 											{% endfor %}
