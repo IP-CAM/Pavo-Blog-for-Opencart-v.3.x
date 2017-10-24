@@ -1,6 +1,7 @@
 <?php
 // Text
-$_['text_subject']  = '%s - New comment';
-$_['text_greeting'] = 'A new password was requested for %s customer account.';
-$_['text_change']   = 'To reset your password click on the link below:';
-$_['text_ip']       = 'The IP used to make this request was:';
+$_['text_subject']  		= '%s - New comment';
+$_['text_dear']				= 'Dear - %';
+$_['text_message']			= 'New comment have been appear for %s.';
+$_['text_link']				= '<a href="%s">Visit now</a>';
+$_['text_thanks']         	= 'Thanks for subcribe!';

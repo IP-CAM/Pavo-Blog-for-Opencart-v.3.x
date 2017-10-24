@@ -34,6 +34,15 @@ class ModelExtensionPavoBlogComment extends Model {
 	}
 
 	/**
+	 * get single comment
+	 */
+	public function getComment( $comment_id = null ) {
+		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_post_comment WHERE comment_id = " . (int)$comment_id;
+		$query = $this->db->query( $sql );
+		return $query->row;
+	}
+
+	/**
 	 * add new comment
 	 *
 	 * @param $data array( 'comment_title', 'comment_name', 'comment_email', 'comment_text', 'comment_user_id' )
@@ -118,9 +127,8 @@ class ModelExtensionPavoBlogComment extends Model {
 			'post_subscribe'		=> 0
 		), $data );
 
-		if ( $this->config->get( 'pavoblog_auto_approve_comment' ) ) {
-			$data['comment_status'] = 1;
-		}
+		// comment status
+		$data['comment_status'] = (int)$this->config->get( 'pavoblog_auto_approve_comment' );
 
 		$data['comment_user_id'] = $this->user->getId() ? $this->user->getId() : 0;
 		$data['comment_customer_id'] = $this->customer->getId() ? $this->customer->getId() : 0;
@@ -193,7 +201,11 @@ class ModelExtensionPavoBlogComment extends Model {
 	 * get email subcribed
 	 */
 	public function getEmailSubcribedPost( $post_id = null ) {
-		$sql = "SELECT DISTINCT comment_email, comment_language_id, comment_store_id, comment_post_id FROM " . DB_PREFIX . "pavoblog_comment WHERE `comment_post_id` = " . (int) $post_id . " AND `comment_subscribe` = 1";
+		$sql = "SELECT DISTINCT comment.comment_email, comment.comment_language_id, comment.comment_store_id, comment.comment_post_id, desc.name FROM " . DB_PREFIX . "pavoblog_comment as comment";
+		$sql .= " INNER JOIN " . DB_PREFIX . "pavoblog_post_description AS desc ON desc.post_id = comment.comment_post_id";
+		$sql .= " WHERE `comment_post_id` = " . (int) $post_id . " AND `comment_subscribe` = 1";
+
+		// excute query
 		$query = $this->db->query( $sql );
 		
 		return $query->rows;

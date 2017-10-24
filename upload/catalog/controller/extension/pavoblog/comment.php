@@ -74,10 +74,13 @@ class ControllerExtensionPavoBlogComment extends Controller {
 		if ( $this->validate() ) {
 			$comment_id = $this->model_extension_pavoblog_comment->addComment( $this->request->post );
 
-			if ( $comment_id ) {
+			$approve_now = $this->config->get( 'pavoblog_auto_approve_comment' );
+			if ( $comment_id && $approve_now ) {
 				$post_id = isset( $this->request->post['comment_post_id'] ) ? (int)$this->request->post['comment_post_id'] : 0;
+				$comment = $this->model_extension_pavoblog_comment->getComment( $comment_id );
+				$email = empty( $comment['email'] ) ? $comment['email'] : '';
 				// send email to users subcribed before
-				$this->sendEmailSubcribed( $post_id );
+				$this->sendEmailSubcribed( $post_id, array( $email ) );
 			}
 
 			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/pavoblog/single', 'post_id=' . (int)$this->request->post['comment_post_id'] ) ) );
@@ -92,7 +95,7 @@ class ControllerExtensionPavoBlogComment extends Controller {
 	/**
 	 * send email subcribed
 	 */
-	private function sendEmailSubcribed( $post_id = false ) {
+	private function sendEmailSubcribed( $post_id = false, $ignores = array() ) {
 		$this->load->model( 'extension/pavoblog/comment' );
 
 		$subcribes = $this->model_extension_pavoblog_comment->getEmailSubcribedPost( $post_id );
@@ -101,7 +104,12 @@ class ControllerExtensionPavoBlogComment extends Controller {
 		$this->load->model('setting/store');
 
 		if ( $subcribes ) foreach ( $subcribes as $subcribe ) {
-			$post_url = $this->url->link( 'extension/pavoblog/single', 'post_id=' . $subcribe['comment_post_id'] )
+			// ignores email
+			if ( in_array( $subcribe['comment_email'], $ignores ) ) continue;
+
+			$data = array();
+			$href = $this->url->link( 'extension/pavoblog/single', 'post_id=' . $subcribe['comment_post_id'] );
+			$post_name = ! empty( $subcribe['name'] ) ? html_entity_decode( $subcribe['name'], ENT_QUOTES, 'UTF-8' ) : '';
 			$store_info = $this->model_setting_store->getStore($subcribe['comment_store_id']);
 
 			if ( $store_info ) {
@@ -125,9 +133,12 @@ class ControllerExtensionPavoBlogComment extends Controller {
 
 			$subject = sprintf( $language->get('text_subject'), $store_name );
 
-			$data['text_welcome'] = sprintf( $language->get('text_welcome'), $store_name );
-
-			$data['store'] = $store_name;
+			// data for email
+			$data['text_dear'] = sprintf( $language->get( 'text_dear' ), $store_name );
+			$data['text_store'] = $store_name;
+			$data['text_message'] = sprintf( $language->get( 'text_message' ), $post_name );
+			$data['text_link'] = sprintf( $language->get( 'text_link' ), $href );
+			$data['text_thanks'] = $language->get( 'text_thanks' );
 
 			$mail = new Mail( $this->config->get( 'config_mail_engine' ) );
 			$mail->parameter = $this->config->get( 'config_mail_parameter' );
@@ -137,7 +148,7 @@ class ControllerExtensionPavoBlogComment extends Controller {
 			$mail->smtp_port = $this->config->get( 'config_mail_smtp_port');
 			$mail->smtp_timeout = $this->config->get( 'config_mail_smtp_timeout');
 
-			$mail->setTo( $customer_info['email'] );
+			$mail->setTo( $subcribe['comment_email'] );
 			$mail->setFrom( $this->config->get('config_email') );
 			$mail->setSender( $store_name );
 			$mail->setSubject( $subject );

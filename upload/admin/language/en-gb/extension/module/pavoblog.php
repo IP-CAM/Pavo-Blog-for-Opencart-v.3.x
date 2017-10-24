@@ -28,6 +28,7 @@ $_['text_posts']				= 'Posts';
 $_['text_width']				= 'Width';
 $_['text_height']				= 'Height';
 $_['edit_text']					= 'Edit';
+$_['text_edit']					= 'Edit';
 $_['text_grid_columns']			= 'Grid Columns';
 $_['text_default_layout']		= 'Default Layout';
 $_['text_grid']					= 'Grid';
@@ -98,7 +99,15 @@ $_['entry_desc_limit_plc']		= 'List Description Limit';
 $_['entry_post_image_thumb']	= 'Post Image Thumb Size (W x H)';
 $_['entry_single_post_image']	= 'Post Image Single (W x H)';
 $_['entry_avatar_image']		= 'Author Avatar (W x H)';
+$_['text_comment']				= 'Comment';
+$_['text_comment_name']			= 'Name';
+$_['text_comment_email']		= 'Email';
 $_['text_reply']				= 'Allow reply comment';
+$_['text_approve']				= 'Approve';
+$_['text_unapprove']			= 'Unapprove';
+$_['text_comment_updated']		= 'Comment updated successfully';
+$_['text_comment_deleted']		= 'Comment deleted successfully';
+$_['text_comments_deleted']		= 'Comments deleted successfully';
 
 //
 $_['entry_text_keyword'] 		= 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';
@@ -120,5 +129,14 @@ $_['error_name']             	= 'Attribute Name must be between 1 and 64 charact
 $_['error_meta_title']       	= 'Meta Title must be greater than 1 and less than 255 characters!';
 $_['error_pavoblog_post_limit']	= 'Items Per Page is required!';
 $_['error_pavoblog_post_description_length']	= 'Post Description Limit required!';
-$_['error_pavoblog_image_thumb_width']	= 'Thumbnail Size Width dimensions required!';
-$_['error_pavoblog_image_thumb_height']	= 'Thumbnail Size Height dimensions required!';
+$_['error_pavoblog_image_thumb_width']			= 'Thumbnail Size Width dimensions required!';
+$_['error_pavoblog_image_thumb_height']			= 'Thumbnail Size Height dimensions required!';
+$_['error_no_select_comment']	= 'Please select comment(s) before delete';
+$_['error_comment_text']		= 'Comment text is required field';
+$_['error_comment_name']		= 'Comment name is required field';
+$_['error_comment_email']		= 'Comment email is required field';
+$_['error_comment_email_invalid'] = 'Comment email is invalid';
+
+
+
+

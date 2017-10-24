@@ -5,30 +5,34 @@ class ModelExtensionPavoblogComment extends Model {
 	/**
 	 * create - update comment
 	 */
-	public function update( $args = array() ) {
+	public function updateComment( $data = array() ) {
+		$data = array_merge( array(
+			'comment_id'	=> '',
+			'comment_text'	=> '',
+			'comment_name'	=> '',
+			'comment_email'	=> ''
+		), $data );
+		extract( $data );
 
+		$sql = "UPDATE " . DB_PREFIX . "pavoblog_comment SET `comment_text` = '".$this->db->escape( $comment_text )."', `comment_name` = '".$this->db->escape( $comment_name )."', `comment_email` = '".$this->db->escape( $comment_email )."' WHERE comment_id = " . (int)$comment_id;
+		$this->db->query( $sql );
 
-		return $this->db->getLastId();
+		return $this->db->countAffected();
 	}
 
 	/**
 	 * delete comment
 	 */
-	public function delete( $comment_id = null ) {
-		if ( ! $comment_id ) {
-			trigger_error( sprintf( '%s was called. comment_id is NULL.', __FUNCTION__ ) );
-		}
-
-		$sql = "DELETE FROM " . DB_PREFIX . "pavoblog_comments WHERE comment_id = " . $comment_id;
+	public function deleteComment( $comment_id = null ) {
+		$sql = "DELETE FROM " . DB_PREFIX . "pavoblog_comment WHERE comment_id = " . $comment_id;
 		$this->db->query( $sql );
-
-		return $this->db->getLastId();
+		return $this->db->countAffected();
 	}
 
 	/**
 	 * get comments
 	 */
-	public function getAll( $args = array() ) {
+	public function getComments( $args = array() ) {
 		$args = array_merge( $args, array(
 				'comment_id'	=> 0,
 				'post_id'		=> 0,
@@ -42,7 +46,8 @@ class ModelExtensionPavoblogComment extends Model {
 			) );
 		extract( $args );
 
-		$sql = 'SELECT * FROM ' . DB_PREFIX . 'pavoblog_comment';
+		$sql = 'SELECT comment.*, postdsc.* FROM ' . DB_PREFIX . 'pavoblog_comment AS comment';
+		$sql .= ' INNER JOIN ' . DB_PREFIX . 'pavoblog_post_description AS postdsc ON postdsc.post_id = comment.comment_post_id AND comment.comment_language_id = postdsc.language_id';
 		$where = $limit = array();
 
 		if ( $comment_id ) {
@@ -82,18 +87,36 @@ class ModelExtensionPavoblogComment extends Model {
 		}
 
 		$query = $this->db->query( $sql );
-		return $query->rows;
+
+		$results = array();
+		if ( $query->rows ) foreach ( $query->rows as $row ) {
+			$row['edit_link'] = $this->url->link( 'extension/module/pavoblog/comment', 'comment_id='.(int)$row['comment_id'].'&user_token=' . $this->session->data['user_token'], true );
+			$row['delete_link'] = $this->url->link( 'extension/module/pavoblog/deleteComment', 'comment_id='.(int)$row['comment_id'].'&user_token=' . $this->session->data['user_token'], true );
+			$row['toggle_approve_link'] = $this->url->link( 'extension/module/pavoblog/toggleCommentStatus', 'comment_id='.(int)$row['comment_id'].'&user_token=' . $this->session->data['user_token'], true );
+			$results[] = $row;
+		}
+		return $results;
 	}
 
-	public function get( $comment_id = null ) {
-		if ( ! $comment_id ) {
-			trigger_error( sprintf( '%s was called. comment_id is NULL.', __FUNCTION__ ) );
-		}
-
+	/**
+	 * get single comment
+	 * @param $comment_id
+	 */
+	public function getComment( $comment_id = null ) {
 		$sql = 'SELECT * FROM ' . DB_PREFIX . 'pavoblog_comment WHERE comment_id = ' . $comment_id;
 
 		$query = $this->db->query( $sql );
-		return $query->rows;
+		return $query->row;
+	}
+
+	/**
+	 * update comment status
+	 */
+	public function updateStatus( $comment_id = false, $status = 1 ) {
+		$sql = "UPDATE " . DB_PREFIX . "pavoblog_comment SET `comment_status` = " . (int)$status . " WHERE `comment_id` = " . (int) $comment_id;
+		$query = $this->db->query( $sql );
+		// affected rows
+		return $this->db->countAffected();
 	}
 
 }

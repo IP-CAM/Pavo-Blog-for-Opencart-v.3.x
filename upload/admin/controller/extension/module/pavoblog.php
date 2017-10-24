@@ -389,6 +389,30 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/comment' );
 
+		// delete comments action
+		if ( $this->request->server['REQUEST_METHOD'] === 'POST' ) {
+			if ( ! $this->user->hasPermission( 'modify', 'extension/module/pavoblog/comment' ) ) {
+				$this->session->data['comment_error'] = $this->language->get( 'error_permission' );
+			} else {
+				$comment_ids = isset( $this->request->post['selected'] ) ? $this->request->post['selected'] : array();
+				if ( $comment_ids ) {
+					foreach ( $comment_ids as $comment_id ) {
+						$this->model_extension_pavoblog_comment->deleteComment( $comment_id );
+					}
+					$this->session->data['comment_success'] = $this->language->get( 'text_comments_deleted' );
+				} else {
+					$this->session->data['comment_error'] = $this->language->get( 'error_no_select_comment' );
+				}
+			}
+
+			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/comments', 'user_token=' . $this->session->data['user_token'], true ) ) );
+		}
+
+		if ( ! empty( $this->session->data['comment_error'] ) ) {
+			$this->errors['error_warning'] = $this->session->data['comment_error'];
+			unset( $this->session->data['comment_error'] );
+		}
+
 		/**
 		 * breadcrumbs data
 		 */
@@ -403,9 +427,16 @@ class ControllerExtensionModulePavoBlog extends Controller {
       		'separator' => ' :: '
    		);
 
-		// comments
-   		$this->data['comments'] = $this->model_extension_pavoblog_comment->getAll();
+   		if ( ! empty( $this->session->data['comment_success'] ) ) {
+   			//text_comment_updated
+   			$this->data['success'] = $this->session->data['comment_success'];
+   			unset( $this->session->data['comment_success'] );
+   		}
 
+		// comments
+   		$this->data['comments'] = $this->model_extension_pavoblog_comment->getComments();
+   		// delete comments
+   		$this->data['delete'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/comments', 'user_token=' . $this->session->data['user_token'], true ) );
 		// set page document title
 		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'comments_heading_title' ) );
 		$this->data['errors'] = $this->errors;
@@ -419,11 +450,46 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	}
 
 	/**
+	 * toggle comment status
+	 */
+	public function toggleCommentStatus() {
+		$comment_id = isset( $this->request->get['comment_id'] ) ? (int)$this->request->get['comment_id'] : false;
+		if ( $comment_id ) {
+			$this->load->model( 'extension/pavoblog/comment' );
+			$this->load->language( 'extension/module/pavoblog' );
+
+			$comment = $this->model_extension_pavoblog_comment->getComment( $comment_id );
+			$status = isset( $comment['comment_status'] ) ? $comment['comment_status'] : 0;
+
+			$status = $status ? 0 : 1;
+
+			$this->model_extension_pavoblog_comment->updateStatus( $comment_id, $status );
+			$this->session->data['comment_success'] = $this->language->get( 'text_comment_updated' );
+		}
+		$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/comments', 'user_token=' . $this->session->data['user_token'], true ) ) ); exit();
+	}
+
+	/**
 	 * view - edit comment
 	 */
 	public function comment() {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/comment' );
+
+		if ( $this->request->server['REQUEST_METHOD'] === 'POST' && $this->validateCommentForm() ) {
+			$comment_id = ! empty( $this->request->get['comment_id'] ) ? (int)$this->request->get['comment_id'] : 0;
+			$status = $this->model_extension_pavoblog_comment->updateComment( $this->request->post );
+			if ( $status ) {
+				$this->session->data['comment_success'] = $this->language->get( 'text_comment_updated' );
+			}
+
+			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/comment', 'comment_id='.$comment_id.'&user_token=' . $this->session->data['user_token'].'&type=module', 'SSL' ) ) );
+		}
+
+		if ( ! empty( $this->session->data['comment_success'] ) ) {
+			$this->data['success'] = $this->session->data['comment_success'];
+			unset( $this->session->data['comment_success'] );
+		}
 
 		/**
 		 * breadcrumbs data
@@ -441,10 +507,11 @@ class ControllerExtensionModulePavoBlog extends Controller {
 
 		$this->data['comment_id'] = ! empty( $_REQUEST['comment_id'] ) ? (int) $_REQUEST['comment_id'] : 0;
 		// comments
-   		$this->data['comment'] = $this->data['comment_id'] ? $this->model_extension_pavoblog_comment->get( $this->data['comment_id'] ) : array();
-
+   		$this->data['comment'] = $this->data['comment_id'] ? $this->model_extension_pavoblog_comment->getComment( $this->data['comment_id'] ) : array();
+   		$this->data['delete_link'] = $this->url->link( 'extension/module/pavoblog/deleteComment', 'comment_id='.(int)$this->data['comment_id'].'&user_token=' . $this->session->data['user_token'], true );
+   		$this->data['action'] = $this->url->link( 'extension/module/pavoblog/comment', 'comment_id='.(int)$this->data['comment_id'].'&user_token=' . $this->session->data['user_token'], true );
 		// set page document title
-		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'comments_heading_title' ) );
+		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'comment_heading_title' ) );
 		$this->data['errors'] = $this->errors;
 		$this->data = array_merge( array(
 			'header'		=> $this->load->controller( 'common/header' ),
@@ -453,6 +520,22 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		), $this->data );
 
 		$this->response->setOutput( $this->load->view( 'extension/module/pavoblog/comment', $this->data ) );
+	}
+
+	/**
+	 * delete comment action
+	 */
+	public function deleteComment() {
+		$comment_id = isset( $this->request->get['comment_id'] ) ? (int)$this->request->get['comment_id'] : 0;
+		$this->load->model( 'extension/pavoblog/comment' );
+		$this->load->language( 'extension/module/pavoblog' );
+		$status = $this->model_extension_pavoblog_comment->deleteComment( $comment_id );
+		if ( $status ) {
+			$this->session->data['comment_success'] = $this->language->get( 'text_comment_deleted' );
+		}
+
+		// redirect to comments list page
+		$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/comments', 'user_token=' . $this->session->data['user_token'], true ) ) ); exit();
 	}
 
 	/**
@@ -601,7 +684,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	}
 
 	private function validateSettingForm() {
-		if ( ! $this->user->hasPermission( 'modify', 'extension/module/pavoblog/settings' )) {
+		if ( ! $this->user->hasPermission( 'modify', 'extension/module/pavoblog/settings' ) ) {
 			$this->errors['warning'] = $this->language->get( 'error_permission' );
 		}
 
@@ -626,6 +709,34 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		}
 		if ( empty( $this->request->post['pavoblog_avatar_height'] ) ) {
 			$this->errors['error_pavoblog_avatar_height'] = $this->language->get( 'error_pavoblog_image_thumb_height' );
+		}
+
+		if ( $this->errors && ! isset( $this->errors['warning'] ) ) {
+			$this->errors['warning'] = $this->language->get( 'error_warning' );
+		}
+		return ! $this->errors;
+	}
+
+	/**
+	 * validate comment form update
+	 */
+	private function validateCommentForm() {
+		if ( ! $this->user->hasPermission( 'modify', 'extension/module/pavoblog/comment' ) ) {
+			$this->errors['warning'] = $this->language->get( 'error_permission' );
+		}
+
+		if ( empty( $this->request->post['comment_text'] ) ) {
+			$this->errors['comment_text'] = $this->language->get( 'error_comment_text' );
+		}
+
+		if ( empty( $this->request->post['comment_name'] ) ) {
+			$this->errors['comment_name'] = $this->language->get( 'error_comment_name' );
+		}
+
+		if ( empty( $this->request->post['comment_email'] ) ) {
+			$this->errors['comment_email'] = $this->language->get( 'error_comment_email' );
+		} else if ( ! filter_var( $this->request->post['comment_email'], FILTER_VALIDATE_EMAIL ) ) {
+			$this->errors['comment_email'] = $this->language->get( 'error_comment_email_invalid' );
 		}
 
 		if ( $this->errors && ! isset( $this->errors['warning'] ) ) {

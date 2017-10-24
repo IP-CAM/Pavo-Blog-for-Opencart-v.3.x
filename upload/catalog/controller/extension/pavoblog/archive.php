@@ -102,7 +102,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 		$data['columns'] = $this->config->get( 'pavoblog_grid_columns' ) ? $this->config->get( 'pavoblog_grid_columns' ) : 3;
 		$data['layout'] = $layout = $this->config->get( 'pavoblog_default_layout' ) ? $this->config->get( 'pavoblog_default_layout' ) : 'grid';
 		$data['date_format'] = $this->config->get( 'pavoblog_date_format' ) ? $this->config->get( 'pavoblog_date_format' ) : 'Y-m-d';
-		$data['time_format'] = $this->config->get( 'pavoblog_time_format' ) ? $this->config->get( 'pavoblog_time_format' ) : 'Y-m-d';
+		$data['time_format'] = $this->config->get( 'pavoblog_time_format' ) ? $this->config->get( 'pavoblog_time_format' ) : '';
 		$data['posts'] = array();
 
 		if ( $posts ) foreach ( $posts as $post ) {
@@ -122,7 +122,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 			$index = @strpos( $description, ' ', (int)$this->config->get( 'pavoblog_post_description_length' ) );
 			$subdescription = substr( $description, 0, $index === false ? 0 : $index );
 			$post['description'] = $subdescription ? $subdescription : $description;
-			$post['href'] = $this->url->link( 'extension/pavoblog/post', 'post_id=' . $post['post_id'] );
+			$post['href'] = $this->url->link( 'extension/pavoblog/single', 'post_id=' . $post['post_id'] );
 			$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'pavoblog/archive', 'username=' . $post['username'] ) : '';
 
 			$data['posts'][] = $post;
