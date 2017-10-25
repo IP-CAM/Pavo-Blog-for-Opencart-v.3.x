@@ -51,6 +51,8 @@ class ControllerExtensionPavoBlogSingle extends Controller{
 			$post['content'] = html_entity_decode( $post['content'], ENT_QUOTES, 'UTF-8' );
 		}
 
+		$post['categories'] = $this->model_extension_pavoblog_post->getCategories( $post_id );
+
 		$data['post'] = $post;
 		/**
 		 * set document title

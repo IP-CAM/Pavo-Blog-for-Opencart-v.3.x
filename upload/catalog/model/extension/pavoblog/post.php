@@ -148,4 +148,24 @@ class ModelExtensionPavoBlogPost extends Model {
  		) );
  	}
 
+ 	/**
+ 	 * get categories
+ 	 */
+ 	public function getCategories( $post_id = false ) {
+ 		$sql = "SELECT cat.*, pdesc.name FROM " . DB_PREFIX . "pavoblog_post_to_category AS cat";
+ 		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_category_description AS pdesc ON pdesc.category_id = cat.category_id AND pdesc.language_id = " . (int)$this->config->get( 'config_language_id' );
+ 		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_category_to_store AS store ON store.category_id = cat.category_id  AND store.store_id = " . (int)$this->config->get( 'config_store_id_id' );
+ 		$sql .= " WHERE cat.post_id = " . (int) $post_id;
+
+ 		$query = $this->db->query( $sql );
+ 		$results = array();
+
+ 		foreach ( $query->rows as $row ) {
+ 			$row['url'] = str_replace( '&amp;', '&', $this->url->link( 'extension/pavoblog/archive', 'pavo_cat_id=' . $row['category_id'] ) );
+ 			$results[] = $row;
+ 		}
+
+ 		return $results;
+ 	}
+
 }

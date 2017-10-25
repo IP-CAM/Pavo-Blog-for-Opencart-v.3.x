@@ -1,0 +1,9 @@
+{% if ( post.tags ) %}
+	<div class="post-tags entry-tags">
+	  	<i class="fa fa-tasks" aria-hidden="true"></i>
+	      	{{ text_categories }} :
+	  	{% for tag in post.tags %}
+	  		<a href="{{ tag.url }}">{{ tag.name }}</a>
+	  	{% endfor %}
+	</div>
+{% endif %}
