@@ -10,7 +10,7 @@ class ModelExtensionPavoBlogComment extends Model {
 	 */
 	public function getComments( $post_id = null ) {
 		$subsSql = "(SELECT * FROM " . DB_PREFIX . "pavoblog_comment WHERE `comment_parent_id` = ".(int)$post_id." )";
-		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM " . DB_PREFIX . "pavoblog_comment AS comments WHERE comments.`comment_post_id` = " . (int)$post_id . " AND comments.`comment_parent_id` = 0 AND comments.`comment_store_id` = " . (int) $this->config->get( 'config_store_id' );
+		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM " . DB_PREFIX . "pavoblog_comment AS comments WHERE comments.`comment_post_id` = " . (int)$post_id . " AND comments.`comment_store_id` = " . (int) $this->config->get( 'config_store_id' ) . " ORDER BY comments.comment_id DESC";
 		$query = $this->db->query( $sql );
 
 		$results = array();

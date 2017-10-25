@@ -4,13 +4,29 @@
 			{{ text_comments }}
 			<span class="comment-count">({{ comment_count }})</span>
 		</h3>
-		<ol class="comment-list">
-			{% for comment in comments %}
-				{% include 'pavoblog/comment/loop-comment.twig' with { 'comment' : comment } %}
-			{% endfor %}
-		</ol>
+		{% include '/pavoblog/comment/comment-list.twig' with { 'parent_id' : 0 } %}
 			
 	{% endif %}
 
 	{% include '/pavoblog/comment/comment-form.twig' %}
 </div>
+<script type="text/javascript">
+	(function($){
+
+		$( document ).on( 'click', '.reply-comment', function( e ) {
+			e.preventDefault();
+			var button = $( this );
+			var comment = button.parents( '.comment:first' );
+			var comment_id = comment.data( 'comment' );
+
+			$( '#comment-form input[name="comment_parent_id"]' ).val( comment_id );
+
+			$('html, body').animate({
+		        scrollTop: $( '#comment-form' ).offset().top
+		    }, 500);
+
+			return false;
+		} );
+
+	})(jQuery);
+</script>

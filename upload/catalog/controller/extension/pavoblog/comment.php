@@ -47,7 +47,7 @@ class ControllerExtensionPavoBlogComment extends Controller {
 		}
 
 		$this->data['date_format'] = $this->config->get( 'pavoblog_date_format' ) ? $this->config->get( 'pavoblog_date_format' ) : 'Y-m-d';
-		$this->data['time_format'] = $this->config->get( 'pavoblog_time_format' ) ? $this->config->get( 'pavoblog_time_format' ) : 'Y-m-d';
+		$this->data['time_format'] = $this->config->get( 'pavoblog_time_format' ) ? $this->config->get( 'pavoblog_time_format' ) : '';
 		$this->data['can_reply'] = $this->config->get( 'pavoblog_reply' );
 		// comments
 		$this->data['comments'] = $this->model_extension_pavoblog_comment->getComments( $post_id );

@@ -921,7 +921,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 				`meta_description` varchar(255) NOT NULL,
 				`meta_keyword` varchar(255) NOT NULL,
 				PRIMARY KEY (`post_id`,`language_id`),
-				KEY `title` (`title`)
+				KEY `name` (`name`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 		");
 
@@ -992,7 +992,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			  `subscribe_id` int(11) NOT NULL AUTO_INCREMENT,
 			  `subscribe_email` varchar(96) NOT NULL,
 			  PRIMARY KEY (`subscribe_id`),
-			  UNIQUE (subscribe_email)
+			  UNIQUE (subscribe_email),
 			  KEY `subscribe_id` (`subscribe_id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 		");

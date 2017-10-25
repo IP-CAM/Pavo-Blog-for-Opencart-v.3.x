@@ -90,6 +90,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 		} else if ( ! empty( $this->request->get['username'] ) ) {
 			$args['user_id'] = (int)$this->request->get['user_id'];
 		}
+
 		/**
 		 * posts
 		 */

@@ -1,4 +1,4 @@
-{% if comment %}
+{% if ( comment and comment.comment_parent_id == parent_id ) %}
 	<li class="comment row" data-comment="{{ comment.comment_id }}">
 		<div class="avatar col-sm-1">
 			<img src="{{ comment.thumb }}" alt="{{ comment.comment_name }}" />
@@ -25,15 +25,7 @@
 					<p>
 						<a href="#" class="reply-comment"><i class="fa fa-reply"></i> {{ text_reply }}</a>
 					</p>
-					{% if comment.comments %}
-						<div class="comment-list">
-							<ol>
-								{% for sub in comment.comments %}
-									{% include 'pavoblog/comment/loop-comment.twig' with { 'comment' : sub } %}
-								{% endfor %}
-							</ol>
-						</div>
-					{% endif %}
+					{% include 'pavoblog/comment/comment-list.twig' with { 'parent_id' : comment.comment_id, 'comments' : comments } %}
 				{% endif %}
 			{% endif %}
 		</div>

@@ -15,7 +15,7 @@ class ControllerExtensionPavoBlogSingle extends Controller{
 
 		$post_id = isset( $this->request->get['pavo_post_id'] ) ? abs( $this->request->get['pavo_post_id'] ) : false;
 		if ( ! $post_id ) {
-			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link('error', '') ) ); exit();
+			$this->response->redirect( str_replace( '&amp;', '&', $this->url->link( 'error', '' ) ) ); exit();
 		}
 		$post = $this->model_extension_pavoblog_post->getPost( $post_id );
 		$data['breadcrumbs'] = array();
