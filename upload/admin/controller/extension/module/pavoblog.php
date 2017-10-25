@@ -124,6 +124,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	public function post() {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/post' );
+		$this->load->model( 'extension/pavoblog/category' );
 		$this->load->model( 'localisation/language' );
 		$this->load->model( 'setting/store' );
 		$this->load->model( 'user/user' );
@@ -196,6 +197,9 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			$this->data['post']['featured'] = 1;
 		}
 
+		$this->data['post']['categories'] = $this->model_extension_pavoblog_post->getPostCategories( $post_id );
+
+		$this->data['categories'] = $this->model_extension_pavoblog_category->getCategories();
 		$this->data['post_data'] = array();
 		if ( ! empty( $this->request->post['post_data'] ) ) {
 			$this->data['post_data'] = $this->request->post['post_data'];
@@ -432,7 +436,9 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		$this->data['category_store'] 		= $category_id ? $this->model_extension_pavoblog_category->getCategoryStore( $category_id ) : array();
 
 		// categories
-   		$this->data['categories'] = $this->model_extension_pavoblog_category->getCategories();
+   		$this->data['categories'] = $this->model_extension_pavoblog_category->getCategories( array(
+   			'not_in'	=> array( $category_id )
+   		) );
 
    		$action_url = $this->url->link( 'extension/module/pavoblog/category', 'user_token=' . $this->session->data['user_token'], true );
    		if ( $category_id ) {
@@ -440,6 +446,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
    		}
    		$this->data['action']	= str_replace( '&amp;', '&', $action_url );
 		$this->data['back_url']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'], true ) );
+
 		// set page document title
 		if ( $this->language && $this->document ) $this->document->setTitle( $this->language->get( 'category_heading_title' ) );
 		$this->data['errors'] = $this->errors;

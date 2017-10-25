@@ -77,6 +77,17 @@ class ModelExtensionPavoblogPost extends Model {
 		return $query->row;
 	}
 
+	public function getPostCategories( $post_id = null ) {
+		$sql = "SELECT category_id FROM " . DB_PREFIX . "pavoblog_post_to_category WHERE `post_id` = " . (int)$post_id;
+		$query = $this->db->query( $sql );
+		$results = array();
+		foreach ( $query->rows as $row ) {
+			$results[] = isset( $row['category_id'] ) ? $row['category_id'] : 0;
+		}
+
+		return $results;
+	}
+
 	public function getPostDescription( $post_id = null ) {
 		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_post_description WHERE post_id =" . $post_id;
 		$query = $this->db->query( $sql );
@@ -104,7 +115,8 @@ class ModelExtensionPavoblogPost extends Model {
 				'type'				=> 'image',
 				'post_data'			=> array(),
 				'post_seo_url'		=> array(),
-				'post_store'		=> array()
+				'post_store'		=> array(),
+				'categories'		=> array()
 			), $data );
 
 		extract( $data );
@@ -123,6 +135,12 @@ class ModelExtensionPavoblogPost extends Model {
 		if ( $post_store ) {
 			foreach ( $post_store as $store_id ) {
 				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_to_store SET `post_id` = " . (int)$post_id . ", `store_id` = '" . (int)$store_id . "'");
+			}
+		}
+
+		if ( $categories ) {
+			foreach ( $categories as $category_id ) {
+				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_to_category SET `post_id` = " . (int)$post_id . ", `category_id` = '" . (int)$category_id . "'");
 			}
 		}
 
@@ -172,18 +190,25 @@ class ModelExtensionPavoblogPost extends Model {
 		// excute query
 		$this->db->query( $sql );
 
-		// category description
+		// post description
 		$this->db->query("DELETE FROM " . DB_PREFIX . "pavoblog_post_description WHERE post_id = '" . (int)$post_id . "'");
-		// category data
+		// post data
 		foreach ( $data['post_data'] as $language_id => $value ) {
 			$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_description SET post_id = '" . (int)$post_id . "', language_id = '" . (int)$language_id . "', name = '" . $this->db->escape($value['name']) . "', description = '" . $this->db->escape($value['description']) . "', content = '" . $this->db->escape($value['content']) . "', tag = '" . $this->db->escape($value['tag']) . "', meta_title = '" . $this->db->escape($value['meta_title']) . "', meta_description = '" . $this->db->escape($value['meta_description']) . "', meta_keyword = '" . $this->db->escape($value['meta_keyword']) . "'");
 		}
 
-		// category to store
+		// post to store
 		$this->db->query("DELETE FROM " . DB_PREFIX . "pavoblog_post_to_store WHERE post_id = '" . (int)$post_id . "'");
 		if (isset($data['post_store'])) {
 			foreach ( $data['post_store'] as $store_id ) {
 				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_to_store SET post_id = '" . (int)$post_id . "', store_id = '" . (int)$store_id . "'");
+			}
+		}
+
+		$this->db->query("DELETE FROM " . DB_PREFIX . "pavoblog_post_to_category WHERE post_id = '" . (int)$post_id . "'");
+		if (isset($data['categories'])) {
+			foreach ( $data['categories'] as $category_id ) {
+				$this->db->query("INSERT INTO " . DB_PREFIX . "pavoblog_post_to_category SET post_id = '" . (int)$post_id . "', category_id = '" . (int)$category_id . "'");
 			}
 		}
 

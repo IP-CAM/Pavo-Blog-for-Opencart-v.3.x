@@ -57,7 +57,9 @@
 					  	</div>
 					  	<div class="panel-body">
 					  		<div class="form-group">
-								
+					  			<div class="well well-sm" style="height: 100px; overflow: auto">
+					  				{% include 'extension/module/pavoblog/category-tree-checkbox.twig' with { 'parent_id' : 0, 'categories' : categories, 'level' : 0, 'checked' : post.categories } %}
+					  			</div>
 						    </div>
 					  	</div>
 					</div>

@@ -12,6 +12,7 @@ class ModelExtensionPavoblogCategory extends Model {
 				'order'			=> 'DESC',
 				'orderby'		=> 'category_id',
 				'start'			=> 0,
+				'not_in'		=> array(),
 				'limit'			=> $this->config->get('pavoblog_post_limit') ? $this->config->get('pavoblog_post_limit') : 10,
 				'language_id'	=> $this->config->get( 'config_language_id' )
 			), $args );
@@ -31,6 +32,10 @@ class ModelExtensionPavoblogCategory extends Model {
 
 		if ( $status != '' ) {
 			$where[] = ' category.status = ' . $status;
+		}
+
+		if ( $not_in ) {
+			$where[] = ' category.category_id NOT IN ( "'.implode( ',\"', $not_in ).'" )';
 		}
 
 		$where = implode( 'AND ', $where );
@@ -135,7 +140,7 @@ class ModelExtensionPavoblogCategory extends Model {
 			'image' 	=> ! empty( $data['image'] ) 		? $this->db->escape( $data['image'] ) : '',
 			'parent_id' => ! empty( $data['parent_id'] ) 	? (int)$data['parent_id'] : 0,
 			'column' 	=> ! empty( $data['column'] ) 		? (int)$data['column'] : 1,
-			'status'	=> ! empty( $data['status'] ) 		? (int)$data['status'] : 1,
+			'status'	=> ! empty( $data['status'] ) 		? (int)$data['status'] : 1
 		);
 		$sql = "INSERT INTO " . DB_PREFIX . "pavoblog_category ( `image`, `parent_id`, `column`, `status`, `date_added`, `date_modified` )";
 		$sql .= " VALUES ( '".$params['image']."', '".$params['parent_id']."', '".$params['column']."', '".$params['status']."', NOW(), NOW() )";
