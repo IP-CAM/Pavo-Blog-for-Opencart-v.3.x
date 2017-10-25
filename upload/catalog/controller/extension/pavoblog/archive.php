@@ -24,29 +24,9 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 			'text' => $this->language->get('text_blog'),
 			'href' => $this->url->link('extension/pavoblog/archive')
 		);
-		if ( isset( $this->request->get['path'] ) ) {
-			$path = '';
-
-			$parts = explode('_', (string)$this->request->get['path']);
-
-			$category_id = (int)array_pop($parts);
-
-			foreach ($parts as $path_id) {
-				if (!$path) {
-					$path = $path_id;
-				} else {
-					$path .= '_' . $path_id;
-				}
-
-				$category_info = $this->model_extension_pavoblog_category->getCategory($path_id);
-
-				if ($category_info) {
-					$data['breadcrumbs'][] = array(
-						'text' => $category_info['name'],
-						'href' => $this->url->link('extension/pavoblog/archive', 'path=' . $path)
-					);
-				}
-			}
+		$category_info = array();
+		if ( isset( $this->request->get['pavo_cat_id'] ) ) {
+			$category_id = (int)$this->request->get['pavo_cat_id'];
 
 			// Set the last category breadcrumb
 			$category_info = $this->model_extension_pavoblog_category->getCategory( $category_id );
@@ -73,12 +53,12 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 
 				$data['breadcrumbs'][] = array(
 					'text' => $category_info['name'],
-					'href' => $this->url->link('extension/pavoblog/archive', 'path=' . $this->request->get['path'] . $url)
+					'href' => $this->url->link( 'extension/pavoblog/archive', 'pavo_cat_id=' . (int)$category_id . $url )
 				);
 			}
 		}
 
-		$data['page'] = isset( $this->request->get['page'] ) ? abs( $this->request->get['page'] ) : 1;
+		$data['page'] = isset( $this->request->get['page'] ) ? (int)$this->request->get['page'] : 1;
 		// posts limit
 		$data['limit'] = $args['limit'] = $this->config->get( 'pavoblog_post_limit' ) ? $this->config->get( 'pavoblog_post_limit' ) : 10;
 		if ( $data['page'] ) {
@@ -87,8 +67,8 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 
 		if ( ! empty( $this->request->get['user_id'] ) ) {
 			$args['user_id'] = (int)$this->request->get['user_id'];
-		} else if ( ! empty( $this->request->get['username'] ) ) {
-			$args['user_id'] = (int)$this->request->get['user_id'];
+		} else if ( ! empty( $this->request->get['pavo_username'] ) ) {
+			$args['username'] = (int)$this->request->get['pavo_username'];
 		}
 
 		/**
@@ -124,7 +104,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 			$subdescription = substr( $description, 0, $index === false ? 0 : $index );
 			$post['description'] = $subdescription ? $subdescription : $description;
 			$post['href'] = $this->url->link( 'extension/pavoblog/single', 'pavo_post_id=' . $post['post_id'] );
-			$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'pavoblog/archive', 'username=' . $post['username'] ) : '';
+			$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'extension/pavoblog/archive', 'pavo_username=' . $post['username'] ) : '';
 
 			$data['posts'][] = $post;
 		}
@@ -150,10 +130,27 @@ class ControllerExtensionPavoBlogArchive extends Controller {
         );
         // end pagination
 
+        // category info
+        $data['category'] = $category_info;
+
 		/**
 		 * set document title
 		 */
-		$this->document->setTitle( $this->language->get( 'heading_title' ) );
+		$title = $this->language->get( 'heading_title' );
+		if ( ! empty( $category_info['meta_title'] ) ) {
+			$title = html_entity_decode( $category_info['meta_title'], ENT_QUOTES, 'UTF-8' );
+		}
+		$this->document->setTitle( $title );
+
+		// set meta description
+		if ( ! empty( $category_info['meta_description'] ) ) {
+			$this->document->setDescription( html_entity_decode( $category_info['meta_description'], ENT_QUOTES, 'UTF-8' ) );
+		}
+
+		// set meta keyword
+		if ( ! empty( $category_info['meta_keyword'] ) ) {
+			$this->document->setKeywords( html_entity_decode( $category_info['meta_keyword'], ENT_QUOTES, 'UTF-8' ) );
+		}
 
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['column_right'] = $this->load->controller('common/column_right');
@@ -161,6 +158,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 		$data['content_bottom'] = $this->load->controller('common/content_bottom');
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
+
 		/**
 		 * set layout template
 		 */

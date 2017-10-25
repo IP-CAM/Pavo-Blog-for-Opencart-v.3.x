@@ -736,7 +736,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 						$seo_urls = $this->model_design_seo_url->getSeoUrlsByKeyword($keyword);
 
 						foreach ($seo_urls as $seo_url) {
-							if (($seo_url['store_id'] == $store_id) && (!isset($this->request->get['post_id']) || (($seo_url['query'] != 'pavo_post_id=' . $this->request->get['post_id'])))) {
+							if (($seo_url['store_id'] == $store_id) && (!isset($this->request->get['category_id']) || (($seo_url['query'] != 'pavo_cat_id=' . $this->request->get['category_id'])))) {
 								$this->errors['keyword'][$store_id][$language_id] = $this->language->get( 'error_keyword' );
 								break;
 							}
@@ -1027,6 +1027,28 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		// END REMOVE USER PERMISSION
 
 		// DEFAULT OPTIONS
+		$this->load->model( 'design/seo_url' );
+		$this->load->model( 'localisation/language' );
+		$this->load->model( 'setting/store' );
+
+		$stores = $this->model_setting_store->getStores();
+		$languages = $this->model_localisation_language->getLanguages();
+		$store_ids = array( 0 );
+		foreach ( $stores as $store ) {
+			$store_ids[] = isset( $store['store_id'] ) ? (int)$store['store_id'] : 0;
+		}
+
+		foreach ( $store_ids as $store_id ) {
+			foreach ( $languages as $language ) {
+				$language_id = isset( $language['language_id'] ) ? (int)$language['language_id'] : 1;
+				$this->model_design_seo_url->addSeoUrl( array(
+					'store_id'		=> $store_id,
+					'language_id'	=> $language_id,
+					'query'			=> 'extension/pavoblog/archive',
+					'keyword'		=> 'blog'
+				) );
+			}
+		}
 
 		$this->load->model( 'setting/setting' );
 		// options insert before

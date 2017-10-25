@@ -18,7 +18,7 @@ class ModelExtensionPavoBlogCategory extends Model {
 			$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_category_to_store AS catSt ON catSt.category_id = cat.category_id AND catSt.store_id = " . (int)$store_id;
 		}
 
-		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_post_description AS catdesc ON catdesc.category_id = post.category_id AND catdesc.language_id = " . $this->db->escape( $language_id );
+		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_category_description AS catdesc ON catdesc.category_id = post.category_id AND catdesc.language_id = " . $this->db->escape( $language_id );
 
 		$where = ' WHERE 1=1';
 
@@ -49,10 +49,11 @@ class ModelExtensionPavoBlogCategory extends Model {
  		$language_id = $this->config->get( 'config_language_id' );
  		$store_id = $this->config->get( 'config_store_id' );
 
- 		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_category AS cat";
- 		$sql .= " INNER JOIN " . DB_PREFIX . "pavoblog_post_description AS catdesc ON catdesc.category_id = cat.category_id AND catdesc.language_id = " . (int)$category_id;
- 		$sql .= " INNER JOIN " . DB_PREFIX . "pavoblog_category_to_store AS catSt ON catSt.store_id = " . (int)$store_id;
+ 		$sql = "SELECT cat.*, catdesc.* FROM " . DB_PREFIX . "pavoblog_category AS cat";
+ 		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_category_description AS catdesc ON catdesc.category_id = cat.category_id AND catdesc.language_id = " . (int)$language_id;
+ 		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_category_to_store AS catSt ON catSt.store_id = " . (int)$store_id;
  		$sql .= " WHERE cat.category_id = " . (int) $category_id;
+ 		$sql .= " GROUP BY cat.category_id";
 
  		$query = $this->db->query( $sql );
  		return $query->row;

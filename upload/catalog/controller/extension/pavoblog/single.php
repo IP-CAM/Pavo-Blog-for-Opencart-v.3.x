@@ -57,7 +57,21 @@ class ControllerExtensionPavoBlogSingle extends Controller{
 		/**
 		 * set document title
 		 */
-		$this->document->setTitle( $this->language->get( 'heading_title' ) );
+		$title = $this->language->get( 'heading_title' );
+		if ( ! empty( $post['meta_title'] ) ) {
+			$title = html_entity_decode( $post['meta_title'], ENT_QUOTES, 'UTF-8' );
+		}
+		$this->document->setTitle( $title );
+
+		// set meta description
+		if ( ! empty( $post['meta_description'] ) ) {
+			$this->document->setDescription( html_entity_decode( $post['meta_description'], ENT_QUOTES, 'UTF-8' ) );
+		}
+
+		// set meta keyword
+		if ( ! empty( $post['meta_keyword'] ) ) {
+			$this->document->setKeywords( html_entity_decode( $post['meta_keyword'], ENT_QUOTES, 'UTF-8' ) );
+		}
 
 		$data['comment_section'] = $this->load->controller( 'extension/pavoblog/comment' );
 		$data['column_left'] = $this->load->controller('common/column_left');

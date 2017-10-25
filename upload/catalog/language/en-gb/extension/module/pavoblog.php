@@ -3,6 +3,7 @@
 $_['heading_title']       	= 'Blog';
 
 // Text
+$_['text_post_empty']		= 'No posts found!';
 $_['text_blog']				= 'Blog';
 $_['text_author']        	= 'Author';
 $_['text_published']		= 'Published';

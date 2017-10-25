@@ -142,5 +142,58 @@
                 ]]>
             </add>
         </operation>
-  </file>
+    </file>
+    <file path="catalog/controller/startup/seo_url.php">
+        <operation>
+            <search>
+                <![CDATA[$this->request->get['route'] = $query->row['query'];]]>
+            </search>
+            <add position="replace"><![CDATA[
+                    if ( $url[0] === 'pavo_cat_id' ) {
+                        // archive
+                        $this->request->get['route'] = 'extension/pavoblog/archive';
+                        $this->request->get['pavo_cat_id'] = $url[1];
+                    } else if ( $url[0] === 'pavo_post_id' ) {
+                        // single
+                        $this->request->get['route'] = 'extension/pavoblog/single';
+                        $this->request->get['pavo_post_id'] = $url[1];
+                    } else if ( $url[0] === 'username' ) {
+                        // archive
+                        $this->request->get['route'] = 'extension/pavoblog/archive';
+                        $this->request->get['pavo_username'] = $url[1];
+                    } else {
+                        $this->request->get['route'] = $query->row['query'];
+                    }
+                ]]></add>
+        </operation>
+        <operation>
+            <search>
+                <![CDATA[} elseif ($key == 'path') {]]>
+            </search>
+            <add position="replace"><![CDATA[
+                    else if ( strpos( $data['route'], 'extension/pavoblog/' ) === 0 ) {
+                        if ( $data['route'] === 'extension/pavoblog/archive' ) {
+                            if ( $key === 'route' ) {
+                                $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "seo_url WHERE `query` = '" . $this->db->escape($key) . "' AND store_id = '" . (int)$this->config->get('config_store_id') . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
+                            } else if ( $key === 'pavo_cat_id' ) {
+                                $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "seo_url WHERE `query` = '" . $this->db->escape($key . '=' . (int)$value) . "' AND store_id = '" . (int)$this->config->get('config_store_id') . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
+                            } else if ( $key === 'pavo_username' ) {
+                                $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "user WHERE username = '".$this->db->escape( $value )."'" );
+                                $query->row['keyword'] = ! empty( $query->row['username'] ) ? $query->row['username'] : '';
+                            }
+                            if ( $query->num_rows && ! empty( $query->row['keyword'] ) ) {
+                                $url .= '/' . $query->row['keyword'];
+                                unset($data[$key]);
+                            }
+                        } else if ( $data['route'] === 'extension/pavoblog/single' && $key === 'pavo_post_id' ) {
+                            $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "seo_url WHERE `query` = '" . $this->db->escape($key . '=' . (int)$value) . "' AND store_id = '" . (int)$this->config->get('config_store_id') . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
+                            if ( $query->num_rows && $query->row['keyword'] ) {
+                                $url .= '/' . $query->row['keyword'];
+                                unset($data[$key]);
+                            }
+                        }
+                    } elseif ($key == 'path') {
+                ]]></add>
+        </operation>
+    </file>
 </modification>
