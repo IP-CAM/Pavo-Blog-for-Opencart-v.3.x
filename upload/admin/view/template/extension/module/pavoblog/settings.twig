@@ -78,14 +78,44 @@
 						            </div>
 						        {% endif %}
 						        <div class="form-group required">
-						              	<label class="col-sm-2 control-label" for="pavoblog_reply"><span data-toggle="tooltip" title="" data-original-title="{{ text_reply }}">{{ text_reply }}</span></label>
-						              	<div class="col-sm-10">
-						                	<select name="pavoblog_reply" id="pavoblog_reply" class="form-control">
-						                		<option value="1"{{ settings.pavoblog_reply == 1 ? ' selected' : '' }}>{{ entry_yes_text }}</option>
-						                		<option value="0"{{ settings.pavoblog_reply == 0 ? ' selected' : '' }}>{{ entry_no_text }}</option>
-						                	</select>
-		                              	</div>
-						            </div>
+					              	<label class="col-sm-2 control-label" for="pavoblog_reply"><span data-toggle="tooltip" title="" data-original-title="{{ text_reply }}">{{ text_reply }}</span></label>
+					              	<div class="col-sm-10">
+					                	<select name="pavoblog_reply" id="pavoblog_reply" class="form-control">
+					                		<option value="1"{{ settings.pavoblog_reply == 1 ? ' selected' : '' }}>{{ entry_yes_text }}</option>
+					                		<option value="0"{{ settings.pavoblog_reply == 0 ? ' selected' : '' }}>{{ entry_no_text }}</option>
+					                	</select>
+	                              	</div>
+					            </div>
+							</fieldset>
+							<fieldset>
+								<legend>{{ tab_seo }}</legend>
+								<div class="table-responsive">
+					                <table class="table table-bordered table-hover">
+					                  	<thead>
+					                    	<tr>
+					                      		<td class="text-left">{{ entry_store }}</td>
+							                  	<td class="text-left">{{ entry_keyword }}</td>
+					                    	</tr>
+					                  	</thead>
+					                  	<tbody>
+					                    {% for store in stores %}
+					                      	<tr>
+						                        <td class="text-left">{{ store.name }}</td>
+						                        <td class="text-left">
+						                        	{% for language in languages %}
+							                          	<div class="input-group"><span class="input-group-addon"><img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /></span>
+							                            	<input type="text" name="seo_data[{{ store.store_id }}][{{ language.language_id }}]" value="{% if seo_data[store.store_id][language.language_id] %}{{ seo_data[store.store_id][language.language_id] }}{% endif %}" placeholder="{{ entry_keyword }}" class="form-control" />
+							                          	</div>
+							                          	{% if errors.keyword[store.store_id][language.language_id] %}
+							                          		<div class="text-danger">{{ errors.keyword[store.store_id][language.language_id] }}</div>
+							                          	{% endif %}
+						                          	{% endfor %}
+						                      	</td>
+					                      	</tr>
+					                    {% endfor %}
+					                  	</tbody>
+					                </table>
+				              	</div>
 							</fieldset>
 						  	<fieldset>
 						  		<legend>{{ text_posts }}</legend>
@@ -203,6 +233,8 @@
 </div>
 <script type="text/javascript">
 	(function($){
+		$('#stores a:first').tab('show');
+		$('#language a:first').tab('show');
 		$( 'input[name="pavoblog_post_single_image_type"]' ).on( 'change', function( e ) {
 			e.preventDefault();
 			var val = $( this ).val();

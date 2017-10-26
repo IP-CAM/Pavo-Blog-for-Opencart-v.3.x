@@ -661,10 +661,16 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	 */
 	public function settings() {
 		$this->load->language( 'extension/module/pavoblog' );
+		$this->load->model( 'localisation/language' );
+		$this->load->model( 'setting/store' );
 		$this->load->model( 'setting/setting' );
+		$this->load->model( 'extension/pavoblog/setting' );
 
 		if ( $this->request->server['REQUEST_METHOD'] === 'POST' && $this->validateSettingForm() ) {
 			$this->model_setting_setting->editSetting( 'pavoblog', $this->request->post, $this->config->get( 'config_store_id' ) );
+			if ( ! empty( $this->request->post['seo_data'] ) ) {
+				$this->model_extension_pavoblog_setting->editSeoData( $this->request->post['seo_data'] );
+			}
 
 			// success message
 			$this->session->data['success'] = $this->language->get( 'text_success' );
@@ -689,6 +695,20 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			unset( $this->session->data['success'] );
 		}
 
+		$this->data['stores'][] = array(
+			'store_id' => 0,
+			'name'     => $this->language->get( 'text_default' )
+		);
+		$this->data['seo_data'] = $this->errors ? $this->request->post['seo_data'] : $this->model_extension_pavoblog_setting->getSeoData();
+
+		$stores = $this->model_setting_store->getStores();
+		foreach ($stores as $store) {
+			$this->data['stores'][] = array(
+				'store_id' => $store['store_id'],
+				'name'     => $store['name']
+			);
+		}
+		$this->data['languages'] = $this->model_localisation_language->getLanguages();
 		$this->data['settings'] = $this->errors ? $this->request->post : $this->model_setting_setting->getSetting( 'pavoblog' );
 		$this->data['pavo_pagination'] = class_exists( 'Pavo_Pagination' );
 		$this->data['save_action']	= str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/settings', 'user_token=' . $this->session->data['user_token'], true ) );
@@ -829,6 +849,29 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			$this->errors['error_pavoblog_avatar_height'] = $this->language->get( 'error_pavoblog_image_thumb_height' );
 		}
 
+		if ($this->request->post['seo_data']) {
+			$this->load->model( 'design/seo_url' );
+
+			foreach ($this->request->post['seo_data'] as $store_id => $language) {
+				foreach ($language as $language_id => $keyword) {
+					if (!empty($keyword)) {
+						if (count(array_keys($language, $keyword)) > 1) {
+							$this->errors['keyword'][$store_id][$language_id] = $this->language->get( 'error_unique' );
+						}
+
+						$seo_urls = $this->model_design_seo_url->getSeoUrlsByKeyword($keyword);
+
+						foreach ($seo_urls as $seo_url) {
+							if ( $seo_url['store_id'] == $store_id && $seo_url['language_id'] == $language_id && $seo_url['query'] != 'extension/pavoblog/archive' ) {
+								$this->errors['keyword'][$store_id][$language_id] = $this->language->get( 'error_keyword' );
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
 		if ( $this->errors && ! isset( $this->errors['warning'] ) ) {
 			$this->errors['warning'] = $this->language->get( 'error_warning' );
 		}
@@ -868,141 +911,8 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	 * create new permission and tables
 	 */
 	public function install() {
-		// START ADD USER PERMISSION
-		$this->load->model( 'user/user_group' );
-		// access - modify pavoblog edit
-		$this->model_user_user_group->addPermission( $this->user->getId(), 'access', 'extension/module/pavoblog/settings' );
-		$this->model_user_user_group->addPermission( $this->user->getId(), 'modify', 'extension/module/pavoblog/settings' );
-		// access - modify pavoblog posts
-		$this->model_user_user_group->addPermission( $this->user->getId(), 'access', 'extension/module/pavoblog/posts' );
-		$this->model_user_user_group->addPermission( $this->user->getId(), 'modify', 'extension/module/pavoblog/post' );
-		// categories
-		$this->model_user_user_group->addPermission( $this->user->getId(), 'access', 'extension/module/pavoblog/categories' );
-		$this->model_user_user_group->addPermission( $this->user->getId(), 'modify', 'extension/module/pavoblog/category' );
-		// comments
-		$this->model_user_user_group->addPermission( $this->user->getId(), 'access', 'extension/module/pavoblog/comments' );
-		$this->model_user_user_group->addPermission( $this->user->getId(), 'modify', 'extension/module/pavoblog/comment' );
-		// END ADD USER PERMISSION
-
-		// CREATE TABLES
-		// posts, comments, categories
-		$this->db->query("
-			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_post` (
-				`post_id` int(11) NOT NULL AUTO_INCREMENT,
-				`image` varchar(255) DEFAULT NULL,
-				`viewed` int(5) NOT NULL DEFAULT '0',
-				`status` tinyint(1) NOT NULL,
-				`featured` tinyint(1) NOT NULL,
-				`user_id` int(11) NOT NULL,
-				`type` varchar(20) NOT NULL,
-				`date_added` datetime NOT NULL,
-				`date_modified` datetime NOT NULL,
-				PRIMARY KEY (`post_id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-		");
-
-		$this->db->query("
-				CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_post_to_store` (
-					`post_id` int(11) NOT NULL,
-					`store_id` int(11) NOT NULL
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-			");
-
-		$this->db->query("
-				CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_post_to_category` (
-					`post_id` int(11) NOT NULL,
-					`category_id` int(11) NOT NULL
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-			");
-
-		// post description
-		$this->db->query("
-			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_post_description` (
-				`post_id` int(11) NOT NULL,
-				`language_id` int(11) NOT NULL,
-				`name` varchar(255) NOT NULL,
-				`description` text NOT NULL,
-				`content` text NOT NULL,
-				`tag` text NOT NULL,
-				`meta_title` varchar(255) NOT NULL,
-				`meta_description` varchar(255) NOT NULL,
-				`meta_keyword` varchar(255) NOT NULL,
-				PRIMARY KEY (`post_id`,`language_id`),
-				KEY `name` (`name`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-		");
-
-		// blog category
-		$this->db->query("
-			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_category` (
-			  `category_id` int(11) NOT NULL AUTO_INCREMENT,
-			  `image` varchar(255) DEFAULT NULL,
-			  `parent_id` int(11) NOT NULL DEFAULT '0',
-			  `column` int(3) NOT NULL DEFAULT '1',
-			  `status` tinyint(1) NOT NULL,
-			  `date_added` datetime NOT NULL,
-			  `date_modified` datetime NOT NULL,
-			  PRIMARY KEY (`category_id`),
-			  KEY `parent_id` (`parent_id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-		");
-
-		// category description
-		$this->db->query("
-			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_category_description` (
-			  `category_id` int(11) NOT NULL,
-			  `language_id` int(11) NOT NULL,
-			  `name` varchar(255) NOT NULL,
-			  `description` text NOT NULL,
-			  `meta_title` varchar(255) NOT NULL,
-			  `meta_description` varchar(255) NOT NULL,
-			  `meta_keyword` varchar(255) NOT NULL,
-			  PRIMARY KEY (`category_id`,`language_id`),
-			  KEY `name` (`name`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-		");
-
-		$this->db->query("
-				CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_category_to_store` (
-					`category_id` int(11) NOT NULL,
-					`store_id` int(11) NOT NULL
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-			");
-
-		// comment table
-		$this->db->query("
-			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_comment` (
-			  `comment_id` int(11) NOT NULL AUTO_INCREMENT,
-			  `comment_title` varchar(255) NULL,
-			  `comment_email` varchar(96) NOT NULL,
-			  `comment_post_id` int(11) NOT NULL,
-			  `comment_user_id` int(11) NOT NULL DEFAULT '0',
-			  `comment_customer_id` int(11) NOT NULL DEFAULT '0',
-			  `comment_name` varchar(64) NOT NULL,
-			  `comment_text` text NOT NULL,
-			  `comment_rating` int(1) NOT NULL,
-			  `comment_status` tinyint(1) NOT NULL DEFAULT '0',
-			  `comment_parent_id` int(11) NOT NULL DEFAULT '0',
-			  `comment_subscribe` tinyint(1) NOT NULL DEFAULT '0',
-			  `comment_store_id` int(11) NOT NULL DEFAULT '0',
-			  `comment_language_id` int(11) NOT NULL DEFAULT '0',
-			  `date_added` datetime NOT NULL,
-			  `date_modified` datetime NOT NULL,
-			  PRIMARY KEY (`comment_id`),
-			  KEY `comment_post_id` (`comment_post_id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-		");
-
-		// comment subscribe
-		$this->db->query("
-			CREATE TABLE IF NOT EXISTS `" . DB_PREFIX . "pavoblog_subscribe_post` (
-			  `subscribe_id` int(11) NOT NULL AUTO_INCREMENT,
-			  `subscribe_email` varchar(96) NOT NULL,
-			  PRIMARY KEY (`subscribe_id`),
-			  UNIQUE (subscribe_email),
-			  KEY `subscribe_id` (`subscribe_id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-		");
+		$this->load->model( 'extension/pavoblog/setting' );
+		$this->model_extension_pavoblog_setting->install();
 	}
 
 	/**
@@ -1010,63 +920,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 	 * remove user permission
 	 */
 	public function uninstall() {
-		// START REMOVE USER PERMISSION
-		$this->load->model( 'user/user_group' );
-		// access - modify pavoblog edit
-		$this->model_user_user_group->removePermission( $this->user->getId(), 'access', 'extension/module/pavoblog/settings' );
-		$this->model_user_user_group->removePermission( $this->user->getId(), 'modify', 'extension/module/pavoblog/settings' );
-		// access - modify pavoblog posts
-		$this->model_user_user_group->removePermission( $this->user->getId(), 'access', 'extension/module/pavoblog/posts' );
-		$this->model_user_user_group->removePermission( $this->user->getId(), 'modify', 'extension/module/pavoblog/post' );
-		// categories
-		$this->model_user_user_group->removePermission( $this->user->getId(), 'access', 'extension/module/pavoblog/categories' );
-		$this->model_user_user_group->removePermission( $this->user->getId(), 'modify', 'extension/module/pavoblog/category' );
-		// comments
-		$this->model_user_user_group->removePermission( $this->user->getId(), 'access', 'extension/module/pavoblog/comments' );
-		$this->model_user_user_group->removePermission( $this->user->getId(), 'modify', 'extension/module/pavoblog/comment' );
-		// END REMOVE USER PERMISSION
-
-		// DEFAULT OPTIONS
-		$this->load->model( 'design/seo_url' );
-		$this->load->model( 'localisation/language' );
-		$this->load->model( 'setting/store' );
-
-		$stores = $this->model_setting_store->getStores();
-		$languages = $this->model_localisation_language->getLanguages();
-		$store_ids = array( 0 );
-		foreach ( $stores as $store ) {
-			$store_ids[] = isset( $store['store_id'] ) ? (int)$store['store_id'] : 0;
-		}
-
-		foreach ( $store_ids as $store_id ) {
-			foreach ( $languages as $language ) {
-				$language_id = isset( $language['language_id'] ) ? (int)$language['language_id'] : 1;
-				$this->model_design_seo_url->addSeoUrl( array(
-					'store_id'		=> $store_id,
-					'language_id'	=> $language_id,
-					'query'			=> 'extension/pavoblog/archive',
-					'keyword'		=> 'blog'
-				) );
-			}
-		}
-
-		$this->load->model( 'setting/setting' );
-		// options insert before
-		$settings = $this->model_setting_setting->getSetting( 'pavoblog' );
-		$settings = array_merge( array(
-			'pavoblog_date_format'				=> 'F j, Y',
-			'pavoblog_time_format'				=> 'g:i a',
-			'pavoblog_pagination'				=> 1,
-			'pavoblog_default_layout'			=> 'grid',
-			'pavoblog_grid_columns'				=> 3,
-			'pavoblog_post_limit'				=> 10,
-			'pavoblog_post_description_length'	=> 200,
-			'pavoblog_image_thumb_width'		=> 370,
-			'pavoblog_image_thumb_height'		=> 210,
-			'pavoblog_auto_approve_comment'		=> 1,
-			'pavoblog_comment_avatar_width'		=> 54,
-			'pavoblog_comment_avatar_height'	=> 54
-		), $settings );
-		$this->model_setting_setting->editSetting( 'pavoblog', $settings, $this->config->get( 'config_store_id' ) );
+		$this->load->model( 'extension/pavoblog/setting' );
+		$this->model_extension_pavoblog_setting->uninstall();
 	}
 }

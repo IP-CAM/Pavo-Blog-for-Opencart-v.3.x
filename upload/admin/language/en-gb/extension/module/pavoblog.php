@@ -115,6 +115,9 @@ $_['text_categories_deleted']	= 'Categories deleted successfully';
 $_['text_category_updated']		= 'Category updated successfully';
 
 //
+$_['text_seo_url_slug']			= 'Slug Seo URL';
+$_['text_seo_url_slug_desc']	= 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';
+$_['text_slug']					= 'Slug';
 $_['entry_text_keyword'] 		= 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';
 $_['entry_store'] 				= 'Stores';
 $_['entry_keyword'] 			= 'Keyword';
@@ -128,6 +131,7 @@ $_['save_button'] 				= 'Save';
 $_['update_button'] 			= 'Update';
 
 // error
+$_['error_keyword']          	= 'SEO URL already in use!';
 $_['error_unique']           	= 'SEO URL must be unique!';
 $_['error_warning']          	= 'Warning: Please check the form carefully for errors!';
 $_['error_name']             	= 'Attribute Name must be between 1 and 64 characters!';
