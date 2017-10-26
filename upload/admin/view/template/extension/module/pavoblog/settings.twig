@@ -253,6 +253,18 @@
 	                              	</div>
 					            </div>
 						  	</fieldset>
+						  	<fieldset>
+						  		<legend>{{ text_comment }}</legend>
+						  		<div class="form-group required">
+					              	<label class="col-sm-2 control-label" for="pavoblog_google_captcha"><span data-toggle="tooltip" title="" data-original-title="{{ text_google_recaptcha_desc }}">{{ text_google_recaptcha }}</span></label>
+					              	<div class="col-sm-10">
+						                <select name="pavoblog_google_captcha" class="form-control" id="pavoblog_google_captcha">
+						                	<option value="0"{{ settings.pavoblog_google_captcha == 0 ? ' selected' : '' }}>{{ text_no }}</option>
+						                	<option value="1"{{ settings.pavoblog_google_captcha == 1 ? ' selected' : '' }}>{{ text_yes }}</option>
+						                </select>
+	                              	</div>
+					            </div>
+						  	</fieldset>
 						</form>
 					</div>
 		    	</div>

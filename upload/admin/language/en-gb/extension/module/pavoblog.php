@@ -115,6 +115,8 @@ $_['text_categories_deleted']	= 'Categories deleted successfully';
 $_['text_category_updated']		= 'Category updated successfully';
 
 //
+$_['text_google_recaptcha']		= 'Google ReCaptcha';
+$_['text_google_recaptcha_desc']= 'You have to enter API Key and Secret key on Pavothemer Settings before choose this option';
 $_['text_seo_url_slug']			= 'Slug Seo URL';
 $_['text_seo_url_slug_desc']	= 'Do not use spaces, instead replace spaces with - and make sure the SEO URL is globally unique.';
 $_['text_slug']					= 'Slug';
