@@ -151,20 +151,27 @@ class ModelExtensionPavoblogSetting extends Model {
 			$store_ids[] = isset( $store['store_id'] ) ? (int)$store['store_id'] : 0;
 		}
 
+		$query_strs = array(
+				'extension/pavoblog/archive' 		=> 'blog',
+				'extension/pavoblog/archive/author' => 'author'
+			);
 		foreach ( $store_ids as $store_id ) {
 			foreach ( $languages as $language ) {
-				$language_id = isset( $language['language_id'] ) ? (int)$language['language_id'] : 1;
-				$sql = "SELECT * FROM " . DB_PREFIX . "seo_url WHERE store_id = " . (int)$store_id . " AND language_id = " . (int)$language_id;
-				$sql .= " AND query='".$this->db->escape( 'extension/pavoblog/archive' )."'";
-				$query = $this->db->query( $sql );
 
-				if ( ! $query->num_rows ) {
-					$this->model_design_seo_url->addSeoUrl( array(
-						'store_id'		=> $store_id,
-						'language_id'	=> $language_id,
-						'query'			=> 'extension/pavoblog/archive',
-						'keyword'		=> 'blog'
-					) );
+				$language_id = isset( $language['language_id'] ) ? (int)$language['language_id'] : 1;
+				foreach ( $query_strs as $str => $val ) {
+					$sql = "SELECT * FROM " . DB_PREFIX . "seo_url WHERE store_id = " . (int)$store_id . " AND language_id = " . (int)$language_id;
+					$sql .= " AND query='".$this->db->escape( $str )."'";
+					$query = $this->db->query( $sql );
+
+					if ( ! $query->num_rows ) {
+						$this->model_design_seo_url->addSeoUrl( array(
+							'store_id'		=> $store_id,
+							'language_id'	=> $language_id,
+							'query'			=> $str,
+							'keyword'		=> $val
+						) );
+					}
 				}
 			}
 		}

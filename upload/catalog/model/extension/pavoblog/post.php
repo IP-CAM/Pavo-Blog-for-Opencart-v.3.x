@@ -23,7 +23,7 @@ class ModelExtensionPavoBlogPost extends Model {
 		$sql = "SELECT SQL_CALC_FOUND_ROWS DISTINCT post.*, pdesc.*, user.username FROM " . DB_PREFIX . "pavoblog_post AS post";
 		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_post_to_store AS postst ON postst.post_id = post.post_id AND postst.store_id = " . (int)$store_id;
 		if ( $category_id ) {
-			$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_category AS cat ON ( cat.category_id = " . $this->db->escape( $category_id ) . " OR cat.parent_id = ".(int)$category_id." )";
+			$sql .= " INNER JOIN " . DB_PREFIX . "pavoblog_category AS cat ON ( cat.category_id = " . $this->db->escape( $category_id ) . " OR cat.parent_id = ".(int)$category_id." )";
 			$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_post_to_category AS post2cat ON post2cat.post_id = post.post_id";
 		}
 
