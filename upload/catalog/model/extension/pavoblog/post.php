@@ -28,14 +28,14 @@ class ModelExtensionPavoBlogPost extends Model {
 		}
 
 		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_post_description AS pdesc ON pdesc.post_id = post.post_id AND pdesc.language_id = " . $this->db->escape( $language_id );
-		$sql .= " LEFT JOIN " . DB_PREFIX . "user as user ON user.user_id = post.user_id";
+		$sql .= " INNER JOIN " . DB_PREFIX . "user as user ON user.user_id = post.user_id";
 
 		$where = ' WHERE 1=1';
 		if ( $user_id ) {
 			$where .= " AND post.user_id = " . (int)$user_id;
 		}
 		if ( $username ){
-			$sql .= " user.username = '".$this->db->escape($username)."'";
+			$sql .= " AND user.username = '".$this->db->escape($username)."'";
 		}
 
 		if ( $featured )

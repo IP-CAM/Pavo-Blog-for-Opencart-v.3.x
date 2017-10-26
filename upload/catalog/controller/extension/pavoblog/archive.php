@@ -68,7 +68,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 		if ( ! empty( $this->request->get['user_id'] ) ) {
 			$args['user_id'] = (int)$this->request->get['user_id'];
 		} else if ( ! empty( $this->request->get['pavo_username'] ) ) {
-			$args['username'] = (int)$this->request->get['pavo_username'];
+			$args['username'] = $this->request->get['pavo_username'];
 		}
 
 		/**
@@ -104,7 +104,7 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 			$subdescription = substr( $description, 0, $index === false ? 0 : $index );
 			$post['description'] = $subdescription ? $subdescription : $description;
 			$post['href'] = $this->url->link( 'extension/pavoblog/single', 'pavo_post_id=' . $post['post_id'] );
-			$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'extension/pavoblog/archive', 'pavo_username=' . $post['username'] ) : '';
+			$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'extension/pavoblog/archive/author', 'pavo_username=' . $post['username'] ) : '';
 
 			$data['posts'][] = $post;
 		}
@@ -163,6 +163,13 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 		 * set layout template
 		 */
 		$this->response->setOutput( $this->load->view( 'pavoblog/archive', $data ) );
+	}
+
+	/**
+	 * author
+	 */
+	public function author() {
+		$this->index();
 	}
 
 	/**

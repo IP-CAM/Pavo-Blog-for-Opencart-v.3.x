@@ -208,8 +208,7 @@ class ModelExtensionPavoblogSetting extends Model {
 		// END REMOVE USER PERMISSION
 	}
 
-	public function getSeoData() {
-		$query_str = 'extension/pavoblog/archive';
+	public function getSeoData( $query_str = 'extension/pavoblog/archive' ) {
 		$sql = "SELECT * FROM " . DB_PREFIX . "seo_url WHERE query='".$this->db->escape( $query_str )."'";
 
 		$query = $this->db->query( $sql );
@@ -230,10 +229,9 @@ class ModelExtensionPavoblogSetting extends Model {
 	/**
 	 * update blog seo url data
 	 */
-	public function editSeoData( $seo_data = array() ) {
+	public function editSeoData( $seo_data = array(), $query_str = 'extension/pavoblog/archive' ) {
 		if ( ! $seo_data ) return;
 		$this->load->model( 'design/seo_url' );
-		$query_str = 'extension/pavoblog/archive';
 
 		foreach ( $seo_data as $store_id => $languages ) {
 			foreach ( $languages as $language_id => $value ) {

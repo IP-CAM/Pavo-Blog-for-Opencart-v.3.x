@@ -668,8 +668,12 @@ class ControllerExtensionModulePavoBlog extends Controller {
 
 		if ( $this->request->server['REQUEST_METHOD'] === 'POST' && $this->validateSettingForm() ) {
 			$this->model_setting_setting->editSetting( 'pavoblog', $this->request->post, $this->config->get( 'config_store_id' ) );
-			if ( ! empty( $this->request->post['seo_data'] ) ) {
-				$this->model_extension_pavoblog_setting->editSeoData( $this->request->post['seo_data'] );
+			if ( ! empty( $this->request->post['blog_url'] ) ) {
+				$this->model_extension_pavoblog_setting->editSeoData( $this->request->post['blog_url'], 'extension/pavoblog/archive' );
+			}
+
+			if ( ! empty( $this->request->post['author_url'] ) ) {
+				$this->model_extension_pavoblog_setting->editSeoData( $this->request->post['author_url'], 'extension/pavoblog/archive/author' );
 			}
 
 			// success message
@@ -699,8 +703,9 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			'store_id' => 0,
 			'name'     => $this->language->get( 'text_default' )
 		);
-		$this->data['seo_data'] = $this->errors ? $this->request->post['seo_data'] : $this->model_extension_pavoblog_setting->getSeoData();
-
+		$this->data['blog_url'] = $this->errors ? $this->request->post['blog_url'] : $this->model_extension_pavoblog_setting->getSeoData( 'extension/pavoblog/archive' );
+		// var_dump( $this->data['blog_url'] ); die();
+		$this->data['author_url'] = $this->errors ? $this->request->post['author_url'] : $this->model_extension_pavoblog_setting->getSeoData( 'extension/pavoblog/archive/author' );
 		$stores = $this->model_setting_store->getStores();
 		foreach ($stores as $store) {
 			$this->data['stores'][] = array(
@@ -849,21 +854,39 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			$this->errors['error_pavoblog_avatar_height'] = $this->language->get( 'error_pavoblog_image_thumb_height' );
 		}
 
-		if ($this->request->post['seo_data']) {
+		if ( ! empty( $this->request->post['blog_url'] ) || $this->request->post['author_url'] ) {
 			$this->load->model( 'design/seo_url' );
 
-			foreach ($this->request->post['seo_data'] as $store_id => $language) {
+			foreach ($this->request->post['blog_url'] as $store_id => $language) {
 				foreach ($language as $language_id => $keyword) {
 					if (!empty($keyword)) {
 						if (count(array_keys($language, $keyword)) > 1) {
-							$this->errors['keyword'][$store_id][$language_id] = $this->language->get( 'error_unique' );
+							$this->errors['blog_url'][$store_id][$language_id] = $this->language->get( 'error_unique' );
 						}
 
 						$seo_urls = $this->model_design_seo_url->getSeoUrlsByKeyword($keyword);
 
 						foreach ($seo_urls as $seo_url) {
 							if ( $seo_url['store_id'] == $store_id && $seo_url['language_id'] == $language_id && $seo_url['query'] != 'extension/pavoblog/archive' ) {
-								$this->errors['keyword'][$store_id][$language_id] = $this->language->get( 'error_keyword' );
+								$this->errors['blog_url'][$store_id][$language_id] = $this->language->get( 'error_keyword' );
+								break;
+							}
+						}
+					}
+				}
+			}
+			foreach ($this->request->post['author_url'] as $store_id => $language) {
+				foreach ($language as $language_id => $keyword) {
+					if (!empty($keyword)) {
+						if (count(array_keys($language, $keyword)) > 1) {
+							$this->errors['author_url'][$store_id][$language_id] = $this->language->get( 'error_unique' );
+						}
+
+						$seo_urls = $this->model_design_seo_url->getSeoUrlsByKeyword($keyword);
+
+						foreach ($seo_urls as $seo_url) {
+							if ( $seo_url['store_id'] == $store_id && $seo_url['language_id'] == $language_id && $seo_url['query'] != 'extension/pavoblog/archive/author' ) {
+								$this->errors['author_url'][$store_id][$language_id] = $this->language->get( 'error_keyword' );
 								break;
 							}
 						}
