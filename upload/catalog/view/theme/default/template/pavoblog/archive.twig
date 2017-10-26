@@ -32,7 +32,7 @@
             {# main container #}
             <div class="row pavoblog-posts archive">
               {% for post in posts %}
-                {% include ( '/pavoblog/content-' ~ layout ~ '.twig' ) %}
+                {% include ( 'pavoblog/content-' ~ layout ~ '.twig' ) %}
               {% endfor %}
             </div>
             <div class="row">

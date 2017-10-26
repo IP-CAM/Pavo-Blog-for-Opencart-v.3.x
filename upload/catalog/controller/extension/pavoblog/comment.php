@@ -13,7 +13,7 @@ class ControllerExtensionPavoBlogComment extends Controller {
 		$this->load->language( 'extension/module/pavoblog' );
 		$this->load->model( 'extension/pavoblog/comment' );
 
-		$this->data['logged_in'] = ( $this->user->getId() || $this->data['logged_in'] ) ? true : false;
+		$this->data['logged_in'] = $this->user && $this->user->getId() ? true : false;
 		$post_id = (int)$this->request->get['pavo_post_id'];
 
 		$this->data['comment_name'] = $this->data['comment_title'] = $this->request->post['comment_email'] = '';
@@ -23,17 +23,17 @@ class ControllerExtensionPavoBlogComment extends Controller {
 
 		if ( isset( $this->session->data['comment_data'] ) && ! empty( $this->session->data['comment_data']['comment_name'] ) ) {
 			$this->data['comment_name'] = $this->session->data['comment_data']['comment_name'];
-		} else if ( $this->user->getId() ) {
+		} else if ( $this->user && $this->user->getId() ) {
 			$this->data['comment_name'] = $this->user->getUserName();
-		} else if ( $this->customer->getId() ) {
+		} else if ( $this->customer && $this->customer->getId() ) {
 			$this->data['comment_name'] = $this->customer->getFirstName() . ' ' . $this->customer->getLastName();
 		}
 
 		if ( isset( $this->session->data['comment_data'] ) && ! empty( $this->session->data['comment_data']['comment_email'] ) ) {
 			$this->data['comment_email'] = $this->session->data['comment_data']['comment_email'];
-		} else if ( $this->user->getId() ) {
+		} else if ( $this->user && $this->user->getId() ) {
 			$this->data['comment_email'] = $this->model_extension_pavoblog_comment->getUserEmail( $this->user->getId() );
-		} else if ( $this->customer->getId() ) {
+		} else if ( $this->customer && $this->customer->getId() ) {
 			$this->data['comment_email'] = $this->customer->getEmail();
 		}
 

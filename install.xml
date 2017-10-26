@@ -131,8 +131,8 @@
             <add position="before">
             <![CDATA[
                 $dirs = array(
-                    DIR_TEMPLATE . $this->theme . '/',
-                    DIR_TEMPLATE . 'default/'
+                    DIR_TEMPLATE . $this->theme . '/template/',
+                    DIR_TEMPLATE . 'default/template/'
                 );
                 foreach ( $dirs as $dir ) {
                     if ( is_dir( $dir ) ) {
