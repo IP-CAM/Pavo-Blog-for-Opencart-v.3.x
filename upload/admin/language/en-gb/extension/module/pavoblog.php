@@ -60,9 +60,19 @@ $_['entry_featured_text']		= 'Featured';
 $_['tab_general'] 				= 'General';
 $_['tab_seo'] 					= 'SEO';
 $_['tab_data'] 					= 'Data';
+$_['tab_post_format']			= 'Format';
 
+// format
+$_['text_image']				= 'Image';
+$_['text_video']				= 'Video';
+$_['text_gallery']				= 'Gallery';
+$_['text_order']				= 'Sort Order';
 // entries
+$_['entry_post_format_heading']	= 'Post Format';
 $_['entry_image_heading'] 		= 'Image';
+$_['entry_video_url']			= 'Youtube Url';
+$_['entry_preview']				= 'Preview';
+
 $_['entry_category_heading'] 	= 'Categories';
 $_['entry_tag_heading'] 		= 'Tags';
 $_['entry_action_heading'] 		= 'Actions';

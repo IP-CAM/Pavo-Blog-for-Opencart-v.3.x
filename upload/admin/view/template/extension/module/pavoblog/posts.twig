@@ -73,7 +73,10 @@
 												  		<input type="checkbox" name="selected[]" value="{{ post.upload_id }}" />
 												  	{% endif %}
 												</td>
-												<td class="text-left">{{ post.name }}</td>
+												<td class="text-left">
+													<i class="fa fa-{{ post.type == 'image' ? 'file-image-o' : ( post.type == 'gallery' ? 'picture-o' : 'film' ) }}"></i>
+													{{ post.name }}
+												</td>
 												<td class="text-left">
 													<a href="{{ post.user_url }}">
 														{{ post.username }}

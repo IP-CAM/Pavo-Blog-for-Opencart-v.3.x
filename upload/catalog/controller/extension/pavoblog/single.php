@@ -31,8 +31,8 @@ class ControllerExtensionPavoBlogSingle extends Controller{
 			'text'	=> $post['name'],
 			'href'	=> $this->url->link( 'extension/pavoblog/single', 'pavo_post_id=' . $post['post_id'] )
 		);
-		if ( empty( $post['post_type'] ) ) {
-			$post['post_type'] = 'image';
+		if ( empty( $post['type'] ) ) {
+			$post['type'] = 'image';
 		}
 
 		// all comments
@@ -52,8 +52,12 @@ class ControllerExtensionPavoBlogSingle extends Controller{
 		}
 
 		$post['categories'] = $this->model_extension_pavoblog_post->getCategories( $post_id );
-
 		$data['post'] = $post;
+		if ( $post['type'] == 'gallery' ) {
+			$this->document->addStyle('catalog/view/javascript/jquery/swiper/css/swiper.min.css');
+			$this->document->addStyle('catalog/view/javascript/jquery/swiper/css/opencart.css');
+			$this->document->addScript('catalog/view/javascript/jquery/swiper/js/swiper.jquery.js');
+		}
 		/**
 		 * set document title
 		 */

@@ -72,10 +72,50 @@ class ModelExtensionPavoblogPost extends Model {
 	 * get single post
 	 */
 	public function getPost( $post_id = null ) {
+		$this->load->model( 'tool/image' );
 		$sql = "SELECT * FROM " . DB_PREFIX . "pavoblog_post WHERE post_id = " . $post_id;
 		$query = $this->db->query( $sql );
-		return $query->row;
+		$results = $query->row;
+		$data = array();
+		foreach ( $results as $name => $value ) {
+			$data[$name] = $value;
+			if ( $name === 'video' && $value ) {
+				$data[ 'iframe_url' ] = $this->getYoutubeIframeUrl( $value );
+			} else if ( $name === 'gallery' ) {
+				$galleries = json_decode( $value, true );
+				$data[$name] = array();
+				foreach ( $galleries as $gallery ) {
+					$gallery['thumb'] = ! empty( $gallery['image'] ) ? $this->model_tool_image->resize( $gallery['image'], 100, 100 ) : $this->model_tool_image->resize( 'no_image.png', 100, 100);
+					$data[$name][] = $gallery;
+				}
+				$data['gallery_count'] = count( $data[$name] );
+			}
+		}
+		return $data;
 	}
+
+ 	public function getYoutubeIframeUrl( $url = '' ) {
+ 		preg_match( '/\s*[a-zA-Z\/\/:\.]*youtu(be.com\/watch\?v=|.be\/)([a-zA-Z0-9\-_]+)([a-zA-Z0-9\/\*\-\_\?\&\;\%\=\.]*)/i', $url, $match );
+		$video_id = ! empty( $match[2] ) ? $match[2] : false;
+		$query = array();
+		if ( $video_id ) {
+			$query = array(
+				'playlist'		=> $video_id,
+				'enablejsapi' 	=> 1,
+				'iv_load_policy'=> 3,
+				'disablekb'		=> 1,
+				'autoplay'		=> 0,
+				'controls'		=> 0,
+				'showinfo'		=> 0,
+				'rel'			=> 0,
+				'loop'			=> 1,
+				'mute'			=> 0,
+				'wmode'			=> 'transparent'
+			);
+		}
+
+		return $video_id ? 'https://youtube.com/embed/' . $video_id . '?' . http_build_query( $query ) : '';
+ 	}
 
 	public function getPostCategories( $post_id = null ) {
 		$sql = "SELECT category_id FROM " . DB_PREFIX . "pavoblog_post_to_category WHERE `post_id` = " . (int)$post_id;
@@ -105,6 +145,8 @@ class ModelExtensionPavoblogPost extends Model {
 		$data = array_merge( array(
 				'name'				=> '',
 				'image'				=> '',
+				'gallery'			=> array(),
+				'video'				=> '',
 				'user_id'			=> 1,
 				'description'		=> '',
 				'content'			=> '',
@@ -120,8 +162,8 @@ class ModelExtensionPavoblogPost extends Model {
 			), $data );
 
 		extract( $data );
-		$sql = "INSERT INTO " . DB_PREFIX . "pavoblog_post (`image`, `viewed`, `status`, `featured`, `user_id`, `type`, `date_added`, `date_modified`)";
-		$sql .= " VALUES ( '". $this->db->escape( $image ) ."', '".(int)$viewed."', '".(int)$status."', '".(int)$featured."', '".(int)$user_id."', '".$this->db->escape( $type )."', '" . ( $date_added ? $this->db->escape( $date_added ) : 'NOW()' ) . "', NOW() )";
+		$sql = "INSERT INTO " . DB_PREFIX . "pavoblog_post (`image`, `gallery`, `video`, `viewed`, `status`, `featured`, `user_id`, `type`, `date_added`, `date_modified`)";
+		$sql .= " VALUES ( '". $this->db->escape( $image ) ."', '".$this->db->escape( json_decode( $gallery ) )."', '".$this->db->escape( $video )."', '".(int)$viewed."', '".(int)$status."', '".(int)$featured."', '".(int)$user_id."', '".$this->db->escape( $type )."', '" . ( $date_added ? $this->db->escape( $date_added ) : 'NOW()' ) . "', NOW() )";
 
 		$this->db->query( $sql );
 		$post_id = $this->db->getLastId();
@@ -163,6 +205,8 @@ class ModelExtensionPavoblogPost extends Model {
 		$data = array_merge( array(
 				'name'				=> '',
 				'image'				=> '',
+				'gallery'			=> array(),
+				'video'				=> '',
 				'user_id'			=> 1,
 				'description'		=> '',
 				'content'			=> '',
@@ -170,6 +214,7 @@ class ModelExtensionPavoblogPost extends Model {
 				'date_added'		=> '',
 				'dated_modifed'		=> '',
 				'viewed'			=> '',
+				'type'				=> 'image',
 				'post_data'			=> array(),
 				'post_seo_url'		=> array(),
 				'post_store'		=> array()
@@ -177,7 +222,7 @@ class ModelExtensionPavoblogPost extends Model {
 
 		extract( $data );
 
-		$sql = "UPDATE " . DB_PREFIX . "pavoblog_post SET `image` = '".$image."', `status` = '".$status."', `featured` = '".$featured."', `user_id` = '".$user_id."', `date_modified` = NOW()";
+		$sql = "UPDATE " . DB_PREFIX . "pavoblog_post SET `image` = '".$image."', `gallery` = '".$this->db->escape( json_encode( $gallery ) )."', `video` = '".$this->db->escape( $video )."', `status` = '".$status."', `featured` = '".$featured."', `user_id` = '".$user_id."', `type` = '".$this->db->escape( $type )."', `date_modified` = NOW()";
 
 		if ( $date_added ) {
 			$sql .= ", `date_added` = '".$date_added."'";

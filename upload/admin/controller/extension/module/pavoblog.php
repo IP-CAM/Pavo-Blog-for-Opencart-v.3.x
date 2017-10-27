@@ -221,7 +221,8 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			$this->data['post_seo_url'] = $this->model_extension_pavoblog_post->getSeoUrlData( $post_id );
 		}
 
-		$this->data['thumb'] = isset( $this->data['post']['image'] ) ? $this->data['post']['image'] : HTTPS_CATALOG . 'image/cache/catalog/opencart-logo-100x100.png';
+		$this->data['thumb'] = isset( $this->data['post']['image'] ) ? $this->data['post']['image'] : $this->model_tool_image->resize('no_image.png', 100, 100);
+		$this->data['no_image'] = $this->model_tool_image->resize('no_image.png', 100, 100);
 		$this->data['action'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true ) );
 
 		$action_url = $this->url->link( 'extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true );
@@ -239,6 +240,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 				);
 		}
 
+		$this->data['video_ajax_url'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/loadVideoPreview', 'user_token=' . $this->session->data['user_token'], true ) );
 		$this->data['add_new_url'] = str_replace( '&amp;', '&', $this->url->link( 'extension/module/pavoblog/post', 'user_token=' . $this->session->data['user_token'], true ) );
 		// enqueue scripts, stylesheet needed to display editor
 		$this->document->addScript( 'view/javascript/summernote/summernote.js' );
@@ -254,6 +256,21 @@ class ControllerExtensionModulePavoBlog extends Controller {
 		), $this->data );
 
 		$this->response->setOutput( $this->load->view( 'extension/module/pavoblog/post', $this->data ) );
+	}
+
+	/**
+	 * load youtube video iframe by url
+	 */
+	public function loadVideoPreview() {
+		$url = ! empty( $this->request->post['url'] ) ? $this->request->post['url'] : false;
+		if ( ! $url ) return;
+		$this->load->model( 'extension/pavoblog/post' );
+
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput( json_encode( array(
+				'status'	=> true,
+				'url'		=> $this->model_extension_pavoblog_post->getYoutubeIframeUrl( $url )
+			) ) );
 	}
 
 	/**

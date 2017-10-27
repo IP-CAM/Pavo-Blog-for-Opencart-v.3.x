@@ -119,6 +119,7 @@
 						<div class="panel-body">
 							<ul class="nav nav-tabs">
 					            <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+					            <li><a href="#tab-format" data-toggle="tab">{{ tab_post_format }}</a></li>
 					            <li><a href="#tab-data" data-toggle="tab">{{ tab_data }}</a></li>
 					            <li><a href="#tab-seo" data-toggle="tab">{{ tab_seo }}</a></li>
 				          	</ul>
@@ -205,6 +206,68 @@
 						              	</div>
 					              	{% endif %}
 								</div>
+								<!-- format -->
+								<div class="tab-pane active" id="tab-format">
+									<div class="form-group">
+				                    	<label class="col-sm-2 control-label" for="input-format">{{ entry_post_format_heading }}</label>
+				                    	<div class="col-sm-10">
+				                      		<select name="type" id="input-format" class="form-control">
+				                      			<option value="image"{{ post.type == 'image' ? ' selected' : '' }}>{{ text_image }}</option>
+				                      			<option value="gallery"{{ post.type == 'gallery' ? ' selected' : '' }}>{{ text_gallery }}</option>
+				                      			<option value="video"{{ post.type == 'video' ? ' selected' : '' }}>{{ text_video }}</option>
+				                      		</select>
+				                    	</div>
+				                  	</div>
+				                  	<div class="form-group format-option{{ post.type == 'gallery' ? '' : ' hide' }}" id="format-gallery">
+				                  		<div class="table-responsive">
+							                <table id="images" class="table table-striped table-bordered table-hover">
+							                  	<thead>
+							                    	<tr>
+								                      	<td class="text-left">{{ entry_image_heading }}</td>
+								                      	<td class="text-right">{{ text_order }}</td>
+								                      	<td></td>
+							                    	</tr>
+							                  	</thead>
+							                  	<tbody>
+							                  		{% set image_row = 0 %}
+							                  		{% for image in post.gallery %}
+								                        <tr id="image-row{{ image_row }}">
+										                    <td class="text-left"><a href="" id="thumb-image0" data-toggle="image" class="img-thumbnail">
+									                    		<img src="{{ image.thumb }}" alt="" title="" data-placeholder="{{ no_image }}"></a>
+										                      	<input type="hidden" name="gallery[{{ image_row }}][image]" value="{{ image.image }}" id="input-image{{ image_row }}" />
+										                  	</td>
+										                    <td class="text-right"><input type="text" name="gallery[{{ image_row }}][sort_order]" value="{{ image.sort_order }}" placeholder="{{ text_order }}" class="form-control" /></td>
+										                    <td class="text-left"><button type="button" onclick="return confirm( '{{ text_confirm }}' ) ? $('#image-row{{ image_row }}').remove() : false;" data-toggle="tooltip" title="" class="btn btn-danger" data-original-title="Remove"><i class="fa fa-minus-circle"></i></button></td>
+								                 		</tr>
+							                 		{% set image_row = image_row + 1 %}
+							                 		{% endfor %}
+                                                </tbody>
+							                  	<tfoot>
+							                    	<tr>
+							                      		<td colspan="2"></td>
+							                      		<td class="text-left"><button type="button" onclick="addImage();" data-toggle="tooltip" title="" class="btn btn-primary" data-original-title="{{ button_image_add }}"><i class="fa fa-plus-circle"></i></button></td>
+							                    	</tr>
+							                  	</tfoot>
+							                </table>
+						              	</div>
+				                  	</div>
+				                  	<div class="form-group format-option{{ post.type == 'video' ? '' : ' hide' }}" id="format-video">
+				                  		<label class="col-sm-2 control-label" for="input-video-url">{{ entry_video_url }}</label>
+				                  		<div class="col-sm-10">
+				                  			<div class="input-group">
+				                  				<input name="video" value="{{ post.video }}" class="form-control" id="input-video-url" />
+				                  				<div class="input-group-btn">
+				                  					<button class="btn btn-default" type="button" id="video-preview-btn"><i class="fa fa-film"></i></button>
+										      	</div>
+										  	</div>
+				                  		</div>
+				                  		<div class="col-sm-12 post-video-preview">
+				                  			{% if ( post.iframe_url ) %}
+				                  				<iframe src="{{ post.iframe_url }}" style="width: 100%; border: none; margin-top: 20px;"></iframe>
+				                  			{% endif %}
+				                  		</div>
+				                  	</div>
+								</div>
 								{# end panel-general #}
 								<div class="tab-pane" id="tab-data">
 									<div class="form-group">
@@ -270,9 +333,58 @@
 	</div>
 </div>
 <script type="text/javascript">
-	$('#language a:first').tab('show');
+	$( '#language a:first' ).tab('show');
 	$( '.datetime' ).datetimepicker({
 		pickTime: false
 	});
+
+	$( document ).on( 'change', '#input-format', function(e) {
+		e.preventDefault();
+		var val = $( this ).val();
+		$( '.format-option' ).addClass( 'hide' );
+		$( '#format-' + val ).removeClass( 'hide' );
+		return false;
+	} );
+
+	$( document ).on( 'click', '#video-preview-btn', function(e) {
+		e.preventDefault();
+		var button = $(this);
+		$.ajax({
+			url: '{{ video_ajax_url }}',
+			type: 'POST',
+			data: {
+				url: $( '#input-video-url' ).val()
+			},
+			beforeSend: function() {
+				$( '.post-video-preview' ).empty();
+				button.find( 'i' ).addClass( 'fa-spin' );
+			}
+		}).always( function(){
+			button.find( 'i' ).removeClass( 'fa-spin' );
+		}).done( function( data ) {
+			if ( data.status == undefined ) return;
+			if ( data.url ) {
+				$( '.post-video-preview' ).html( '<iframe src="'+data.url+'" style="width: 100%; border: none; margin-top: 20px;"></iframe>' );
+			}
+		});
+
+		return false;
+	} );
+
+	<!--
+	var image_row = {{ post.gallery_count }};
+
+	function addImage() {
+		html  = '<tr id="image-row' + image_row + '">';
+		html += '  <td class="text-left"><a href="" id="thumb-image' + image_row + '"data-toggle="image" class="img-thumbnail"><img src="{{ no_image }}" alt="" title="" data-placeholder="{{ no_image }}" /></a><input type="hidden" name="gallery[' + image_row + '][image]" value="" id="input-image' + image_row + '" /></td>';
+		html += '  <td class="text-right"><input type="text" name="gallery[' + image_row + '][sort_order]" value="" placeholder="{{ text_order }}" class="form-control" /></td>';
+		html += '  <td class="text-left"><button type="button" onclick="return confirm( \'{{ text_confirm }}\' ) ? $(\'#image-row' + image_row  + '\').remove() : false" data-toggle="tooltip" title="{{ text_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>';
+		html += '</tr>';
+
+		$('#images tbody').append(html);
+
+		image_row++;
+	}
+	//-->
 </script>
 {{ footer }}

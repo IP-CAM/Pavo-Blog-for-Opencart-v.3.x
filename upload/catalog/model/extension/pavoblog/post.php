@@ -100,6 +100,7 @@ class ModelExtensionPavoBlogPost extends Model {
  	 * @param $post_id
  	 */
  	public function getPost( $post_id = null ) {
+ 		$this->load->model( 'tool/image' );
  		$language_id = $this->config->get( 'config_language_id' );
  		$store_id = $this->config->get( 'config_store_id' );
  		$sql = "SELECT post.*, user.username, user.user_id, pdesc.* FROM " . DB_PREFIX . "pavoblog_post AS post";
@@ -109,7 +110,60 @@ class ModelExtensionPavoBlogPost extends Model {
  		$sql .= " WHERE post.post_id = " . (int)$post_id;
 
  		$query = $this->db->query( $sql );
- 		return $query->row;
+ 		$results = $query->row;
+ 		$data = array();
+
+ 		foreach ( $results as $name => $value ) {
+			$data[$name] = $value;
+			if ( $name === 'video' && $value ) {
+				$data['iframe_url'] = $this->getYoutubeIframeUrl( $value );
+			} else if ( $name === 'gallery' ) {
+				$galleries = json_decode( $value, true );
+				$nw = array();
+				foreach ( $galleries as $gallery ) {
+					$sort_id = isset( $gallery['sort_order'] ) ? (int)$gallery['sort_order'] : 1;
+					if ( isset( $nw[$sort_id] ) ) {
+						$sort_id++;
+					}
+
+					if ( $this->config->get( 'pavoblog_post_single_image_type' ) ) {
+						$gallery['image'] = ( $this->request->server['HTTPS'] ? HTTPS_SERVER : HTTP_SERVER ) . 'image/' . $gallery['image'];
+					} else {
+						$width = $this->config->get( 'pavoblog_single_image_width' );
+						$height = $this->config->get( 'pavoblog_single_image_height' );
+						$gallery['image'] = $this->model_tool_image->resize( $width ? $width : 370, $height ? $height : 228 );
+					}
+					$nw[$sort_id] = $gallery;
+				}
+
+				ksort( $nw );
+				$data['gallery'] = $nw;
+			}
+		}
+ 		return $data;
+ 	}
+
+ 	public function getYoutubeIframeUrl( $url = '' ) {
+ 		preg_match( '/\s*[a-zA-Z\/\/:\.]*youtu(be.com\/watch\?v=|.be\/)([a-zA-Z0-9\-_]+)([a-zA-Z0-9\/\*\-\_\?\&\;\%\=\.]*)/i', $url, $match );
+		$video_id = ! empty( $match[2] ) ? $match[2] : false;
+		$query = array();
+		if ( $video_id ) {
+			$query = array(
+				'playlist'		=> $video_id,
+				'enablejsapi' 	=> 1,
+				'iv_load_policy'=> 3,
+				'disablekb'		=> 1,
+				'autoplay'		=> 0,
+				'controls'		=> 0,
+				'showinfo'		=> 0,
+				'rel'			=> 0,
+				'loop'			=> 1,
+				'mute'			=> 0,
+				'wmode'			=> 'transparent'
+			);
+		}
+
+		return $video_id ? 'https://youtube.com/embed/' . $video_id . '?' . http_build_query( $query ) : '';
  	}
 
  	/**
