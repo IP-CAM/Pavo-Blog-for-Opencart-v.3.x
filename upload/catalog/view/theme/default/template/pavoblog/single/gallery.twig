@@ -1,7 +1,7 @@
 {% set uniqe = now|date('YmdHis') %}
 <div class="pavoblog-media media-gallery">
 	<div class="swiper-viewport">
-	  	<div id="banner{{ uniqe }}" class="swiper-container">
+	  	<div id="gallery{{ uniqe }}" class="swiper-container">
 	    	<div class="swiper-wrapper">
 	    		{% for gallery in post.gallery %}
 	      			<div class="swiper-slide">
@@ -18,7 +18,7 @@
   	</div>
 </div>
 <script type="text/javascript"><!--
-$('#banner{{ uniqe }}').swiper({
+$('#gallery{{ uniqe }}').swiper({
 	mode: 'horizontal',
 	slidesPerView: 5,
 	pagination: '.carousel{{ uniqe }}',
