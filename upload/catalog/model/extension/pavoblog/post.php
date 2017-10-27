@@ -16,7 +16,8 @@ class ModelExtensionPavoBlogPost extends Model {
 			'language_id'	=> $this->config->get( 'config_language_id' ),
  			'date_added'	=> date( 'Y-m-d' ),
  			'status'		=> 1,
- 			'store_id'		=> $this->config->get('config_store_id')
+ 			'store_id'		=> $this->config->get('config_store_id'),
+ 			's'				=> ''
 		), $data );
 		extract( $data );
 
@@ -120,7 +121,7 @@ class ModelExtensionPavoBlogPost extends Model {
 			} else if ( $name === 'gallery' ) {
 				$galleries = json_decode( $value, true );
 				$nw = array();
-				foreach ( $galleries as $gallery ) {
+				if ( $galleries ) foreach ( $galleries as $gallery ) {
 					$sort_id = isset( $gallery['sort_order'] ) ? (int)$gallery['sort_order'] : 1;
 					if ( isset( $nw[$sort_id] ) ) {
 						$sort_id++;
