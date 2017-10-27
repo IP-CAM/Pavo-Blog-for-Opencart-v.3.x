@@ -24,7 +24,8 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 			'text' => $this->language->get('text_blog'),
 			'href' => $this->url->link('extension/pavoblog/archive')
 		);
-		$category_info = array();
+		$category_info = $author_info = array();
+		$archive_heading = '';
 		if ( isset( $this->request->get['pavo_cat_id'] ) ) {
 			$category_id = (int)$this->request->get['pavo_cat_id'];
 
@@ -56,19 +57,30 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 					'href' => $this->url->link( 'extension/pavoblog/archive', 'pavo_cat_id=' . (int)$category_id . $url )
 				);
 			}
+		} else if ( ! empty( $this->request->get['user_id'] ) ) {
+			$args['user_id'] = (int)$this->request->get['user_id'];
+			$author_info = $this->model_extension_pavoblog_post->getAuthorByUserId( $args['user_id'] );
+		} else if ( ! empty( $this->request->get['pavo_username'] ) ) {
+			$args['username'] = $this->request->get['pavo_username'];
+			$author_info = $this->model_extension_pavoblog_post->getAuthorByUsername( $args['username'] );
 		}
+
+		if ( $category_info ) {
+			$archive_heading = sprintf( $this->language->get( 'archive_category_heading' ), $category_info['name'] );
+		} else if ( $author_info ) {
+			$archive_heading = sprintf( $this->language->get( 'archive_author_heading' ), $author_info['user_nicename'] );
+		}
+
+        // category info
+        $data['category_info'] = $category_info;
+        $data['author_info'] = $author_info;
+        $data['archive_heading'] = $archive_heading;
 
 		$data['page'] = isset( $this->request->get['page'] ) ? (int)$this->request->get['page'] : 1;
 		// posts limit
 		$data['limit'] = $args['limit'] = $this->config->get( 'pavoblog_post_limit' ) ? $this->config->get( 'pavoblog_post_limit' ) : 10;
 		if ( $data['page'] ) {
 			$args['start'] = ( $data['page'] - 1 ) * $args['limit'];
-		}
-
-		if ( ! empty( $this->request->get['user_id'] ) ) {
-			$args['user_id'] = (int)$this->request->get['user_id'];
-		} else if ( ! empty( $this->request->get['pavo_username'] ) ) {
-			$args['username'] = $this->request->get['pavo_username'];
 		}
 
 		/**
@@ -129,9 +141,6 @@ class ControllerExtensionPavoBlogArchive extends Controller {
         	ceil( $total / $args['limit'] )
         );
         // end pagination
-
-        // category info
-        $data['category'] = $category_info;
 
 		/**
 		 * set document title

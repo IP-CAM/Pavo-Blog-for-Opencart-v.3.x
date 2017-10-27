@@ -20,7 +20,7 @@ class ModelExtensionPavoBlogPost extends Model {
 		), $data );
 		extract( $data );
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS DISTINCT post.*, pdesc.*, user.username FROM " . DB_PREFIX . "pavoblog_post AS post";
+		$sql = "SELECT SQL_CALC_FOUND_ROWS DISTINCT post.*, pdesc.*, user.username, CONCAT( user.firstname, ' ', user.lastname ) AS user_nicename FROM " . DB_PREFIX . "pavoblog_post AS post";
 		$sql .= " LEFT JOIN " . DB_PREFIX . "pavoblog_post_to_store AS postst ON postst.post_id = post.post_id AND postst.store_id = " . (int)$store_id;
 		if ( $category_id ) {
 			$sql .= " INNER JOIN " . DB_PREFIX . "pavoblog_category AS cat ON ( cat.category_id = " . $this->db->escape( $category_id ) . " OR cat.parent_id = ".(int)$category_id." )";
@@ -166,6 +166,29 @@ class ModelExtensionPavoBlogPost extends Model {
  		}
 
  		return $results;
+ 	}
+
+ 	/**
+ 	 * get author by id
+ 	 */
+ 	public function getAuthorById( $user_id = false ) {
+ 		$sql = 'SELECT *, CONCAT( user.firstname, " ", user.lastname ) AS user_nicename FROM ' . DB_PREFIX . 'user AS user WHERE user.user_id="'.$this->db->escape( $user_id ).'"';
+ 		$query = $this->db->query( $sql );
+ 		if ( $query->row ) {
+ 			return $query->row;
+ 		}
+ 	}
+
+ 	/**
+ 	 * get author data by username
+ 	 */
+ 	public function getAuthorByUsername( $username = '' ) {
+ 		$sql = 'SELECT *, CONCAT( user.firstname, " ", user.lastname ) AS user_nicename FROM ' . DB_PREFIX . 'user AS user WHERE user.username="'.$this->db->escape( $username ).'"';
+
+ 		$query = $this->db->query( $sql );
+ 		if ( $query->row ) {
+ 			return $query->row;
+ 		}
  	}
 
 }

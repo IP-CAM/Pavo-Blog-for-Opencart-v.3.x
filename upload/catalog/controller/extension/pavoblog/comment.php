@@ -46,6 +46,23 @@ class ControllerExtensionPavoBlogComment extends Controller {
 			unset( $this->session->data['comment_data'] );
 		}
 
+		// reCaptcha
+		$this->data['captcha_api_key'] = $this->config->get( 'pavothemer_google_recaptra_api_key' );
+		$this->data['captcha_secret_key'] = $this->config->get( 'pavothemer_google_recaptra_secret_key' );
+		$this->data['captcha'] = $this->config->get( 'pavoblog_google_captcha' ) && $this->data['captcha_api_key'] && $this->data['captcha_secret_key'];
+		$captchaUrl ='//www.google.com/recaptcha/api.js';
+		$scripts = $this->document->getScripts();
+		$enqueued = false;
+		foreach ( $scripts as $script ) {
+			if ( strpos( $script, $captchaUrl ) !== false ) {
+				$enqueued = true;
+			}
+		}
+		if ( ! $enqueued ) {
+			$this->document->addScript( $captchaUrl );
+		}
+		// end reCaptcha
+
 		$this->data['date_format'] = $this->config->get( 'pavoblog_date_format' ) ? $this->config->get( 'pavoblog_date_format' ) : 'Y-m-d';
 		$this->data['time_format'] = $this->config->get( 'pavoblog_time_format' ) ? $this->config->get( 'pavoblog_time_format' ) : '';
 		$this->data['can_reply'] = $this->config->get( 'pavoblog_reply' );

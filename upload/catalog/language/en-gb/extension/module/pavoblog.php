@@ -2,6 +2,8 @@
 // Heading
 $_['heading_title']       	= 'Blog';
 
+$_['archive_author_heading'] = 'Posts published by: %s';
+$_['archive_category_heading'] = 'Posts published in category: %s';
 // Text
 $_['text_post_empty']		= 'No posts found!';
 $_['text_blog']				= 'Blog';
