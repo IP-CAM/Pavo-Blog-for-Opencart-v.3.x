@@ -84,7 +84,7 @@ class ModelExtensionPavoblogPost extends Model {
 			} else if ( $name === 'gallery' ) {
 				$galleries = json_decode( $value, true );
 				$data[$name] = array();
-				foreach ( $galleries as $gallery ) {
+				if ( $galleries ) foreach ( $galleries as $gallery ) {
 					$gallery['thumb'] = ! empty( $gallery['image'] ) ? $this->model_tool_image->resize( $gallery['image'], 100, 100 ) : $this->model_tool_image->resize( 'no_image.png', 100, 100);
 					$data[$name][] = $gallery;
 				}

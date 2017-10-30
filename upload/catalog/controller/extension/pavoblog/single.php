@@ -52,6 +52,7 @@ class ControllerExtensionPavoBlogSingle extends Controller{
 		}
 
 		$post['categories'] = $this->model_extension_pavoblog_post->getCategories( $post_id );
+		$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'extension/pavoblog/archive/author', 'pavo_username=' . $post['username'] ) : '';
 		$data['post'] = $post;
 		if ( $post['type'] == 'gallery' ) {
 			$this->document->addStyle('catalog/view/javascript/jquery/swiper/css/swiper.min.css');
