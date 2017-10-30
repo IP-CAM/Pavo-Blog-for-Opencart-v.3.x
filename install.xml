@@ -130,13 +130,15 @@
             </search>
             <add position="before">
             <![CDATA[
-                $dirs = array(
-                    DIR_TEMPLATE . $this->theme . '/template/',
-                    DIR_TEMPLATE . 'default/template/'
-                );
-                foreach ( $dirs as $dir ) {
-                    if ( is_dir( $dir ) ) {
-                        $loader->addPath( $dir );
+                if ( ! defined( 'DIR_CATALOG' ) ) {
+                    $dirs = array(
+                        DIR_TEMPLATE . $this->theme . '/template/',
+                        DIR_TEMPLATE . 'default/template/'
+                    );
+                    foreach ( $dirs as $dir ) {
+                        if ( is_dir( $dir ) ) {
+                            $loader->addPath( $dir );
+                        }
                     }
                 }
                 ]]>
