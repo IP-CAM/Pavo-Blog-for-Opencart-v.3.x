@@ -7,7 +7,7 @@ class ModelExtensionPavoBlogPost extends Model {
 			'start'			=> 0,
 			'limit'			=> 10,
 			'category_id'	=> '',
-			'tags'			=> '',
+			'tag'			=> '',
 			'user_id'		=> '',
 			'username'		=> '',
 			'featured' 		=> '',
@@ -45,17 +45,18 @@ class ModelExtensionPavoBlogPost extends Model {
 		if ( $category_id )
 			$where .= " AND post2cat.category_id = " . (int)$category_id;
 
-		if ( $tags ) {
+		if ( $tag ) {
 			$implode = array();
 
-			$words = explode( ' ', trim( preg_replace('/\s+/', ' ', $tags ) ) );
+			$words = explode( ' ', trim( preg_replace('/\s+/', ' ', $tag ) ) );
 
 			foreach ( $words as $word ) {
-				$implode[] = "post.tag LIKE '%" . $this->db->escape($word) . "%'";
+				$implode[] = "pdesc.tag LIKE '%" . $this->db->escape($word) . "%'";
 			}
 
 			if ( $implode ) {
-				$where .= " " . implode(" AND ", $implode) . "";
+				$where .= " AND " . implode(" AND ", $implode) . "";
+				// echo $where; die();
 			}
 		}
 
@@ -226,7 +227,7 @@ class ModelExtensionPavoBlogPost extends Model {
  	/**
  	 * get author by id
  	 */
- 	public function getAuthorById( $user_id = false ) {
+ 	public function getAuthorByUserId( $user_id = false ) {
  		$sql = 'SELECT *, CONCAT( user.firstname, " ", user.lastname ) AS user_nicename FROM ' . DB_PREFIX . 'user AS user WHERE user.user_id="'.$this->db->escape( $user_id ).'"';
  		$query = $this->db->query( $sql );
  		if ( $query->row ) {

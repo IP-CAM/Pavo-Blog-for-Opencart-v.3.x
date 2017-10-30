@@ -51,6 +51,9 @@ class ControllerExtensionPavoBlogSingle extends Controller{
 			$post['content'] = html_entity_decode( $post['content'], ENT_QUOTES, 'UTF-8' );
 		}
 
+		if ( ! empty( $post['tag'] ) ) {
+			$post['tag_href'] = $this->url->link( 'extension/pavoblog/archive', 'tag=' . $post['tag'] );
+		}
 		$post['categories'] = $this->model_extension_pavoblog_post->getCategories( $post_id );
 		$post['author_href'] = ! empty( $post['username'] ) ? $this->url->link( 'extension/pavoblog/archive/author', 'pavo_username=' . $post['username'] ) : '';
 		$data['post'] = $post;

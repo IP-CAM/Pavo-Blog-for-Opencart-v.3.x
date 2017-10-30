@@ -179,15 +179,21 @@
             </search>
             <add position="replace"><![CDATA[
                     } else if ( strpos( $data['route'], 'extension/pavoblog/' ) === 0 ) {
+
                         if ( $data['route'] === 'extension/pavoblog/archive' ) {
                             if ( $key === 'route' ) {
-                                $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "seo_url WHERE `query` = '" . $this->db->escape($key) . "' AND store_id = '" . (int)$this->config->get('config_store_id') . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
-                            } else if ( $key === 'pavo_cat_id' ) {
-                                $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "seo_url WHERE `query` = '" . $this->db->escape($key . '=' . (int)$value) . "' AND store_id = '" . (int)$this->config->get('config_store_id') . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
-                            }
-                            if ( $query->num_rows && ! empty( $query->row['keyword'] ) ) {
-                                $url .= '/' . $query->row['keyword'];
-                                unset($data[$key]);
+                                $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "seo_url WHERE `query` = '" . $this->db->escape($value) . "' AND store_id = '" . (int)$this->config->get('config_store_id') . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
+                                if ( $query->num_rows && ! empty( $query->row['keyword'] ) ) {
+                                    $url .= '/' . $query->row['keyword'];
+                                    unset($data[$key]);
+                                }
+                                if ( isset( $data['pavo_cat_id'] ) ) {
+                                    $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "seo_url WHERE `query` = '" . $this->db->escape('pavo_cat_id=' . (int)$data['pavo_cat_id']) . "' AND store_id = '" . (int)$this->config->get('config_store_id') . "' AND language_id = '" . (int)$this->config->get('config_language_id') . "'");
+                                    if ( $query->num_rows && ! empty( $query->row['keyword'] ) ) {
+                                        $url .= '/' . $query->row['keyword'];
+                                        unset($data['pavo_cat_id']);
+                                    }
+                                }
                             }
                         } else if ( $data['route'] === 'extension/pavoblog/archive/author' ) {
 

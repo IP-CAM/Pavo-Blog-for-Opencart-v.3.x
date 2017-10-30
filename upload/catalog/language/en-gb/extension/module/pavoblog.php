@@ -18,6 +18,9 @@ $_['text_posted_by']		= 'Posted by';
 $_['text_readmore']			= 'Read more';
 $_['text_reply']			= 'Reply';
 $_['text_edit']				= 'Edit';
+$_['text_post_category']	= 'Category: %s';
+$_['text_post_author']		= 'Author: %s';
+$_['text_post_tag']			= 'Tag: %s';
 
 // pagination
 $_['text_next']				= 'Next';

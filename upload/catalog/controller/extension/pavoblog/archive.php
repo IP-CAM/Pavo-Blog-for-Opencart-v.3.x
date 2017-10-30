@@ -53,16 +53,36 @@ class ControllerExtensionPavoBlogArchive extends Controller {
 				}
 
 				$data['breadcrumbs'][] = array(
-					'text' => $category_info['name'],
+					'text' => sprintf( $this->language->get( 'text_post_category' ), $category_info['name'] ),
 					'href' => $this->url->link( 'extension/pavoblog/archive', 'pavo_cat_id=' . (int)$category_id . $url )
 				);
 			}
 		} else if ( ! empty( $this->request->get['user_id'] ) ) {
+			$url = '';
 			$args['user_id'] = (int)$this->request->get['user_id'];
 			$author_info = $this->model_extension_pavoblog_post->getAuthorByUserId( $args['user_id'] );
+			// breadcrumbs
+			$data['breadcrumbs'][] = array(
+					'text' => sprintf( $this->language->get( 'text_post_author' ), $author_info['user_nicename'] ),
+					'href' => $this->url->link( 'extension/pavoblog/archive/author', 'pavo_username=' . $author_info['username'] . $url )
+				);
 		} else if ( ! empty( $this->request->get['pavo_username'] ) ) {
+			$url = '';
 			$args['username'] = $this->request->get['pavo_username'];
 			$author_info = $this->model_extension_pavoblog_post->getAuthorByUsername( $args['username'] );
+			// breadcrumbs
+			$data['breadcrumbs'][] = array(
+					'text' => sprintf( $this->language->get( 'text_post_author' ), $author_info['user_nicename'] ),
+					'href' => $this->url->link( 'extension/pavoblog/archive/author', 'pavo_username=' . $author_info['username'] . $url )
+				);
+		} else if ( ! empty( $this->request->get['tag'] ) ) {
+			$url = '';
+			$args['tag'] = $this->request->get['tag'];
+			// breadcrumbs
+			$data['breadcrumbs'][] = array(
+					'text' => sprintf( $this->language->get( 'text_post_tag' ), $this->request->get['tag'] ),
+					'href' => $this->url->link( 'extension/pavoblog/archive', 'tag=' . $this->request->get['tag'] . $url )
+				);
 		}
 
 		if ( $category_info ) {
