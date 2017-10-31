@@ -417,7 +417,7 @@ class ControllerExtensionModulePavoBlog extends Controller {
 			'href'      => $this->url->link( 'extension/module/pavoblog/categories', 'user_token=' . $this->session->data['user_token'].'&type=module', 'SSL' ),
       		'separator' => ' :: '
    		);
-   		$this->data['languages'] = $this->model_localisation_language->getLanguages();
+
 		$this->data['stores'][] = array(
 			'store_id' => 0,
 			'name'     => $this->language->get( 'text_default' )

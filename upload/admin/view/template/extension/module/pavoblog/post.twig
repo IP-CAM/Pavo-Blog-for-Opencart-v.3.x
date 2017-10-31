@@ -372,7 +372,7 @@
 	} );
 
 	<!--
-	var image_row = {{ post.gallery_count }};
+	var image_row = {{ post.gallery_count ? post.gallery_count : 0 }};
 
 	function addImage() {
 		html  = '<tr id="image-row' + image_row + '">';
